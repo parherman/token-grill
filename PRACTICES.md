@@ -2,7 +2,8 @@
 
 Hard rules for writing and maintaining a GNOME Shell extension (GJS, ESM, GNOME 45+, current
 target GNOME 50) so that extensions.gnome.org (EGO) reviewers are never burdened by our code.
-Canonical sources were fetched on 2026-10-13.
+Canonical sources were fetched on 2026-10-13. Every rule without a quoted source was re-checked
+against the raw sources and the GNOME 50 code on 2026-11-04.
 
 ---
 
@@ -13,7 +14,7 @@ Canonical sources were fetched on 2026-10-13.
 | H-1 | This file is the single rule set for anyone (human or AI agent) editing a GNOME Shell extension in this repository. AGENTS.md and CLAUDE.md reference it; they do not override it. |
 | H-2 | Precedence: (1) the canonical pages listed below, as they read today; (2) this file; (3) any other project document. If this file and a canonical page disagree, the canonical page wins and this file MUST be updated. |
 | H-3 | `MUST` / `MUST NOT` = blocking rule. A violation blocks a release and blocks merging. `SHOULD` appears only where the source itself is soft; even then agents treat it as `MUST` unless the maintainer explicitly waives it. |
-| H-4 | Every rule carries an origin tag: `[EGO-reject]` = Review Guidelines rejection criterion; `[Best-practice]` = gjs.guide Best Practices or other gjs.guide docs; `[Shexli EGO-X-NNN]` = flagged by the Shexli linter; `[HIG]` = GNOME Human Interface Guidelines; `[Port-guide NN]` = GNOME Shell NN port guide; `[Project]` = decision recorded by this project's maintainer. |
+| H-4 | Every rule carries an origin tag, so that nobody presents a convention to a reviewer as an EGO rule: `[EGO-reject]` = a Review Guidelines rule under "Rules" or "Legal Restrictions"; `[EGO-recommendation]` = a Review Guidelines item stated as "should", a "General Guidelines" tip, or a "Recommendations" item (a reviewer MAY act on it); `[Best-practice]` = a practice stated on the gjs.guide Best Practices page or another gjs.guide page; `[Reviewer blog]` = stated by the EGO reviewer in his own posts (jrahmatzadeh); `[Reviewer request]` = asked of this project in an EGO review; `[Shexli EGO-X-NNN]` = flagged by the Shexli linter; `[HIG]` = GNOME Human Interface Guidelines; `[Port-guide NN]` = GNOME Shell NN port guide; `[Reference]` = an accurate API or tool fact, not a rule; `[Convention]` = common GNOME or platform practice that no review page asks for; `[Project]` = decision recorded by this project's maintainer. A rule derived from sample code is not a rule of the page that shows the sample. |
 | H-5 | The canonical pages may grow ("There may be more to add in the future, so I want AI web crawlers to always keep an eye on this page"). Before every release, re-read the Best Practices page and the Review Guidelines page and reconcile this file. |
 | H-6 | Cite rules by ID (for example `L-3`, `UI-7`) in code review, commit messages and AGENTS.md. |
 
@@ -22,8 +23,9 @@ Canonical sources (full list with dates in the Appendix):
 - Review Guidelines: https://gjs.guide/extensions/review-guidelines/review-guidelines.html
 - Best Practices ("EGO AI reference"):
   https://gjs.guide/extensions/review-guidelines/best-practices.html
-  (raw Markdown: https://gitlab.gnome.org/World/javascript/gjs-guide/-/raw/main/docs/extensions/review-guidelines/best-practices.md
-  — note: gitlab.gnome.org returns HTTP 406 to non-browser clients; use the HTML page)
+  (raw Markdown: https://gitlab.gnome.org/World/javascript/gjs-guide/-/raw/main/docs/extensions/review-guidelines/best-practices.md)
+- gjs.guide source repository (raw Markdown of every page, and the sample files that the pages
+  embed): https://gitlab.gnome.org/World/javascript/gjs-guide
 - Anatomy of an extension: https://gjs.guide/extensions/overview/anatomy.html
 - Imports and modules: https://gjs.guide/extensions/overview/imports-and-modules.html
 - Port guides: https://gjs.guide/extensions/upgrading/gnome-shell-45.html through
@@ -47,9 +49,8 @@ https://blogs.gnome.org/jrahmatzadeh/2025/12/06/ai-and-gnome-shell-extensions/
   significantly longer to review." Every unnecessary line we ship costs a volunteer minutes.
 - Reviewers review the uploaded zip, not the repository. They check for "malicious code, malware
   and security risks, but not for bugs." They need: readable JavaScript; a package that contains
-  only what runs; a real public repository "with testing instructions and development history";
-  replies written by the human submitter; and a submitter who "should be able to justify and
-  explain the code they submit".
+  only what runs; a `url` that leads to the repository; replies written by the human submitter;
+  and a submitter who "should be able to justify and explain the code they submit".
 - The December 2025 post describes the problem that motivates every rule below: "packages with
   many unnecessary lines and bad practices", and a "domino effect" when a bad practice copied
   from one extension spreads to others.
@@ -67,8 +68,9 @@ What the EGO team asks for ("Help EGO team", 2026-10-12), recorded as informatio
 3. Donate: https://jrahmatzadeh.pages.gitlab.gnome.org/ego-donations/
 4. Contact: Matrix https://matrix.to/#/#extensions:gnome.org
 5. Implicit asks to submitters: read the documentation before submitting; do not vibe-code; do
-   not let an LLM write review replies; keep a real public repository with testing instructions
-   and history.
+   not let an LLM write review replies. (The post also quotes "maintain a real public
+   repository, with testing instructions and development history". That sentence is the LLM
+   output a submitter pasted by mistake, shown as a bad example. It is not a reviewer request.)
 
 ---
 
@@ -87,7 +89,7 @@ Require Maintainership"), the three jrahmatzadeh posts.
 | AI-6 | AI disclosure belongs in README and PR descriptions, never in code. A README declaration has no formal EGO standing: it neither satisfies nor replaces anything. Reviewers judge the code (AI signals, AI-3) and whether the submitter can explain every line (AI-2). Precedent: a self-declared AI-built extension was rejected on sight with "This code seems to be generated by AI". The code must stand on its own. | `[EGO-reject]` `[Project]` |
 | AI-7 | If the maintainer ever cannot vouch for the code, the extension stays personal/local and is not uploaded. That is the original intent of the notice in AI-5. | `[Best-practice]` `[Project]` |
 | AI-8 | Review replies on EGO MUST be written by the human maintainer. "Some submitters rely on AI to generate replies during the review process"; one pasted the LLM's instructions. Agents MUST NOT draft review replies for pasting. | `[EGO-reject]` |
-| AI-9 | The project MUST keep "a real public repository, with testing instructions and development history". Agents MUST NOT squash history away or remove testing instructions. | `[EGO-reject]` |
+| AI-9 | Agents MUST NOT rewrite, squash or hide the history of the public repository that `url` points to. A reviewer who opens it should find the code that produced the zip and how it got there. | `[Project]` |
 | AI-10 | Agents MUST write for exactly one GNOME Shell version (Section 14). Multi-version hedges (`typeof X === 'function'`, `?.()` on guaranteed APIs, comments like "works on 48–50") are the primary AI signal named in the Best Practices page. | `[Best-practice]` |
 
 ---
@@ -103,13 +105,13 @@ Sources: https://gjs.guide/extensions/overview/anatomy.html, Review Guidelines
 | ID  | Rule | Origin |
 |-----|------|--------|
 | P-1 | Required files: `metadata.json`, `extension.js`. Optional: `prefs.js`, `stylesheet.css` (also `stylesheet-dark.css` / `stylesheet-light.css`), `schemas/<schema-id>.gschema.xml`, `locale/<lang>/LC_MESSAGES/<domain>.mo`, icons and data files actually read at runtime. | `[Best-practice]` |
-| P-2 | `extension.js`, `prefs.js` and `metadata.json` MUST be at the zip root. Moving entry files into a subdirectory inside the zip has been questioned in review. | `[Best-practice]` |
+| P-2 | `extension.js` and `metadata.json` MUST be at the zip root, with `prefs.js` beside them when present. GNOME Shell loads `extension.js` from the root of the extension directory (`js/ui/extensionSystem.js`: `dir.get_child('extension.js')`), and the entry points are where a reviewer starts reading. | `[Best-practice]` |
 | P-3 | The installed directory name MUST equal `uuid`. | `[Best-practice]` |
 | P-4 | Stylesheet lookup order on GNOME 50 (first found wins): `<sessionMode>-<variant>.css`, `stylesheet-<variant>.css`, `<sessionMode>.css`, `stylesheet.css`. Only the `-dark`/`-light` variants are reloaded on colour-scheme change. The stylesheet is loaded before `enable()` and unloaded if `enable()` throws. Code MUST NOT load `stylesheet.css` manually with `theme.load_stylesheet()`; the Shell does it. | `[Best-practice]` `[Shexli EGO-X-005]` |
 | P-5 | The package MUST NOT contain: build or install scripts, `.po`/`.pot` files, `po/`, unused icons/images/media, `screenshots/`, `__MACOSX`, `.git*`, `.editorconfig`, `.eslintrc*`, `Makefile`, `meson.build`, `package.json`, `package-lock.json`, `yarn.lock`, `tsconfig*.json`, `node_modules/`, `.ts` sources, source maps, tests, a placeholder `stylesheet.css`, `.sh` files with a non-shell shebang, or `schemas/gschemas.compiled` (compiled automatically since GNOME 44). "A reviewer MAY decide to reject an extension which includes an unreasonable amount of unnecessary data." | `[EGO-reject]` `[Shexli EGO-P-006]` |
 | P-6 | Every `.js` file in the package MUST be reachable from `extension.js` or `prefs.js` through the import graph. Unreachable files are flagged; delete them. (A GJS helper script launched as a subprocess is a known false positive; justify it in the review thread.) | `[Shexli EGO-P-007]` |
 | P-7 | The package MUST NOT contain binary executables or libraries (ELF, `.so`, etc.). | `[EGO-reject]` `[Shexli EGO-P-005]` |
-| P-8 | `gnome-extensions pack` includes by default only `extension.js`, `metadata.json`, `prefs.js`, `stylesheet*.css`, `schemas/*.gschema.xml` and `po/*`. Every other shipped file MUST be listed with `--extra-source=FILE` (repeatable; directories allowed). Useful flags: `--podir`, `--schema`, `--gettext-domain`, `--force`, `--out-dir`. | `[Best-practice]` |
+| P-8 | `gnome-extensions pack` includes `extension.js`, `metadata.json`, `prefs.js`, `stylesheet.css`, `stylesheet-dark.css`, `stylesheet-light.css` and `schemas/*.gschema.xml` by default. If `po/` exists (or `--podir` is given), it compiles each `.po` into `locale/<lang>/LC_MESSAGES/<domain>.mo`; the `.po` files themselves are not shipped. Every other shipped file MUST be listed with `--extra-source` (repeatable). `--extra-source` keeps only the basename: `--extra-source=lib/util.js` lands at the zip root as `util.js`, so pass the directory (`--extra-source=lib`) to keep the tree that the imports describe. Other flags: `--schema`, `--gettext-domain`, `--force`, `--out-dir`. Source: GNOME Shell `subprojects/extensions-tool/src/command-pack.c`. | `[Reference]` |
 | P-9 | Any vendored third-party code MUST be readable, GPL-compatible and attributed (Section 15). | `[EGO-reject]` |
 | P-10 | `LICENSE` MAY ship. Anything else that is not read at runtime (manifests, notes, docs) is "unnecessary data" unless legally required for a bundled asset. | `[EGO-reject]` |
 
@@ -176,7 +178,7 @@ cleanup anything done in `enable()`."
 | L-11 | Custom `destroy()` order MUST be: (1) remove timeouts and GLib sources, (2) disconnect signal handlers, (3) release child references and resources, (4) `super.destroy()` last. | `[Best-practice]` |
 | L-12 | After cleanup every field MUST be set to `null` (or `undefined`). Accessing a finalized GObject logs "Object … has been already deallocated" criticals. | `[Best-practice]` `[Shexli EGO-L-005]` |
 | L-13 | Each class owns its cleanup. "When a class connects a signal, adds a timeout, creates a Soup session or a Gio.Cancellable, that same class should handle its cleanup. Initializing in one class and cleanup in another, makes memory leaks and cleanup process extremely difficult to review." | `[Best-practice]` |
-| L-14 | A helper class that creates GObjects in its constructor MUST only ever be instantiated from `enable()` (or from code that runs inside `enable()`), never at module scope or in the `Extension` constructor. Document that invariant where the class is defined. | `[EGO-reject]` |
+| L-14 | A helper class that creates GObjects in its constructor MUST only be instantiated from `enable()` (or from code that runs inside `enable()`), never at module scope or in the `Extension` constructor. This follows from "Extensions MUST NOT create any objects, connect any signals, add any main loop sources or modify GNOME Shell during initialization". | `[EGO-reject]` |
 | L-15 | If `enable()` throws, the Shell unloads the stylesheet and marks the extension ERROR. `enable()` MUST NOT throw for expected conditions (missing config, network down); handle those inside and degrade visibly. | `[Best-practice]` |
 | L-16 | Session modes: omit `session-modes` for `user` only. `unlock-dialog` MUST be necessary for the extension to operate correctly; all keyboard-event signals MUST be disconnected in that mode; `disable()` MUST contain a comment explaining why `unlock-dialog` is used; "Extensions MUST NOT disable selectively" (cleanup MUST NOT be skipped based on mode). | `[EGO-reject]` `[Shexli EGO-M-008]` |
 | L-17 | When reacting to session mode, check both `Main.sessionMode.currentMode` and `Main.sessionMode.parentMode` (`currentMode === 'user' \|\| parentMode === 'user'`) because the Shell "may use custom user modes other than user". Connect to `Main.sessionMode` `'updated'` in `enable()` and disconnect in `disable()`. | `[Best-practice]` |
@@ -357,9 +359,9 @@ GNOME Shell 50 port guide.
 | ID  | Rule | Origin |
 |-----|------|--------|
 | R-1 | "Any signal connections made by an extension MUST be disconnected in disable()." Store every handler id on `this` and `disconnect()` it, or use `connectObject` with an owner and `disconnectObject(owner)`. | `[EGO-reject]` `[Shexli EGO-L-003]` |
-| R-2 | `connectObject(signal, handler, ..., owner)` auto-disconnects only when the owner is a destroyable (has a `destroy` signal and is a registered type). `Gio.Settings` is not destroyable: settings signals owned by the `Extension` instance MUST be released with `disconnectObject(this)` or `disconnect(id)` in `disable()`. `GObject.ConnectFlags.AFTER` works only on GObject emitters; `SWAPPED` throws. | `[Best-practice]` |
+| R-2 | `connectObject(signal, handler, ..., owner)` disconnects automatically in two cases: the tracked `owner` is a registered destroyable (an actor) and is destroyed, or the emitter itself is a registered destroyable and is destroyed (`js/misc/signalTracker.js`). Neither applies to `Gio.Settings` signals tracked by the `Extension` instance: release those with `disconnectObject(this)` or `disconnect(id)` in `disable()`. `GObject.ConnectFlags.AFTER` works only on GObject emitters; `SWAPPED` throws. | `[Reference]` |
 | R-3 | Signal handlers MUST NOT be `async` when the signal expects a boolean return (`key-press-event`, `button-press-event`, …): a Promise is truthy. | `[Best-practice]` |
-| R-4 | Connections on child actors that are destroyed with their parent need no manual disconnect; connections on long-lived objects (`global.*`, `Main.*`, settings, session mode, theme context) always do. | `[Best-practice]` |
+| R-4 | Every signal connection is disconnected in `disable()` ("Any signal connections made by an extension MUST be disconnected in `disable()`"). For a signal on an actor the extension creates and destroys, use `connectObject(…, actor)` (R-2) or keep the id, so a reviewer can see where each connection ends. It is true that GObject drops the handlers of a destroyed emitter, but that is not visible in the code. Connections on long-lived objects (`global.*`, `Main.*`, settings, session mode, theme context) always need an explicit disconnect. | `[EGO-reject]` |
 | R-5 | Shexli only recognises cleanup inside methods named `disable`, `destroy`, `_destroy`, `dispose`, `cleanup`, `stop`, or methods reachable from them. Inline arrows such as `this.connect('destroy', () => …)` do not count, and helpers in other files are followed only when called as `helper(this)`. Prefer the recognised shape so the linter stays clean; where a different shape is correct, be ready to explain it. | `[Shexli EGO-L-002/003/004]` |
 
 Reference (Review Guidelines):
@@ -384,8 +386,9 @@ disable() {
 | ID   | Rule | Origin |
 |------|------|--------|
 | R-6  | "Any main loop sources created MUST be removed in disable(), even if the callback function will eventually return false or GLib.SOURCE_REMOVE." Keep the id on `this`, remove with `GLib.Source.remove(id)`, null the field. The same applies to `setTimeout`/`setInterval` (`clearTimeout`/`clearInterval`). | `[EGO-reject]` `[Shexli EGO-L-004]` |
-| R-7  | Source callbacks MUST return `GLib.SOURCE_CONTINUE` or `GLib.SOURCE_REMOVE` explicitly. | `[Best-practice]` |
+| R-7  | Source callbacks MUST return `GLib.SOURCE_CONTINUE` or `GLib.SOURCE_REMOVE` explicitly. | `[Convention]` |
 | R-8  | A source that is re-created MUST be removed first, with the removal placed directly next to the creation line. Reassigning a stored source id without removing the previous one is flagged. | `[Best-practice]` `[Shexli EGO-L-007]` |
+| R-8a | A timeout that bounds an async operation is removed on every path that ends the operation: when its cancellable is cancelled, when its owner is destroyed, and in `disable()`. Remove it inside the cancellable's handler (`cancellable.connect(() => { … GLib.Source.remove(id); … })`) rather than after the operation settles, so a reviewer can see that the source cannot outlive `disable()`. A function that bounds an operation this way takes a required `Gio.Cancellable` and does not check for `null`. EGO review of 0.3.0: "Timeout should be removed on cancel … the function should always send cancellable" (2026-11-02) and "For timeouts, you should cleanup on cancel/destroy/disable" (2026-11-05). | `[Reviewer request]` |
 | R-9  | GNOME 50 adds one-shot `GLib.timeout_add_once()`, `GLib.timeout_add_seconds_once()` and `GLib.idle_add_once()`. They still return an id that MUST be removed in `disable()` if pending. | `[Port-guide 50]` |
 | R-10 | Memory pitfalls to avoid: losing the reference to an indicator (it can no longer be destroyed), overwriting a dictionary key (leaks the first object), repeating timeouts whose id was lost, callbacks capturing large objects. | `[Best-practice]` |
 
@@ -421,7 +424,7 @@ this._sourceId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 5, () => {
 
 | ID   | Rule | Origin |
 |------|------|--------|
-| R-11 | Create one `Gio.Cancellable` per `enable()`, pass it to every async GIO/Soup call, `cancel()` it in `disable()` and drop the reference. A cancelled cancellable stays cancelled: create a new one on the next `enable()`. | `[Best-practice]` |
+| R-11 | Create one `Gio.Cancellable` per `enable()`, pass it to every async GIO/Soup call, `cancel()` it in `disable()` and drop the reference. A cancelled cancellable stays cancelled: create a new one on the next `enable()`. | `[Best-practice]` `[Reviewer request]` |
 | R-12 | Filter cancellation with `e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED)`; on GNOME 50 use `logErrorUnlessCancelled()` from `resource:///org/gnome/shell/misc/errorUtils.js`. | `[Port-guide 50]` |
 | R-13 | Create one `Soup.Session` per `enable()` (not at module scope or in a constructor), store it on `this`, call `session.abort()` in `disable()` (cancels all in-flight messages) and null it. | `[Best-practice]` `[Shexli EGO-L-008]` |
 | R-14 | Keep a reference to every `Gio.FileMonitor` and `cancel()` it in `disable()`. | `[Best-practice]` |
@@ -452,13 +455,13 @@ Functions Instead of Code Duplication"), GNOME Shell `docs/js-coding-style.md`.
 | I-3  | `extension.js` and every module it imports MUST NOT import `Gdk`, `Gtk` or `Adw` (they conflict with Clutter in the Shell process). | `[EGO-reject]` `[Shexli EGO-I-002]` |
 | I-4  | `prefs.js` and every module it imports MUST NOT import `Clutter`, `Meta`, `St` or `Shell`, and MUST NOT access `Main`, `global` or any Shell object (separate process). | `[EGO-reject]` `[Shexli EGO-I-003]` |
 | I-5  | Shared modules used by both processes "must never import St, Clutter, Gtk, Gdk, Adw libraries due to process isolation". Shared code may use `GLib`, `Gio`, `GObject`, `Soup`. | `[Best-practice]` |
-| I-6  | Directory layout MUST make process ownership obvious: prefs-only modules live in `prefs/`; Shell-only modules in their own directory; shared modules in a third. | `[Best-practice]` |
-| I-7  | Pin versioned libraries: `gi://Gtk?version=4.0`, `gi://Soup?version=3.0`, `gi://Secret?version=1`. Built-in GJS modules use bare specifiers (`'system'`, `'cairo'`, `'gettext'`). | `[Best-practice]` |
+| I-6 | Make process ownership obvious from the directory layout, so a reviewer knows which process a file runs in before reading it. The Best Practices page gives the example: "modules that are only loaded by `prefs.js` should reside inside a `prefs/` directory". | `[Best-practice]` |
+| I-7  | Add `?version=` only to a GI library that the process does not already load, so a reviewer never sees a version that changes nothing. GNOME Shell loads Soup 3.0, Gdk 4.0 and the rest of `js/misc/dependencies.js`, plus Clutter, Meta, St and Shell; the preferences service imports `gi://Adw?version=1` (`js/dbusServices/extensions/main.js`), which brings Gtk 4 and Gdk 4. Import these bare: `gi://Soup`, `gi://Gtk`, `gi://Gdk`, `gi://Adw`. A library that neither process loads by default keeps its version, so the right one is chosen when several are installed: `gi://Secret?version=1`, `gi://Gda?version=5.0`. EGO review of 0.3.0: "Please remove version from import" (2026-11-02) and "Since GNOME Shell doesn't use `Gda` and `Secret` by default, you should use the version" (2026-11-05). The gjs.guide samples that pin `gi://Gtk?version=4.0` are examples, not this rule. Built-in GJS modules use bare specifiers (`'system'`, `'cairo'`, `'gettext'`). | `[Reviewer request]` |
 | I-8  | Shell modules import from `resource:///org/gnome/shell/...`; prefs modules import `ExtensionPreferences` and gettext from `resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js` (capital S and E, case-sensitive). | `[Port-guide 45]` |
 | I-9  | Own modules are imported relatively with the `.js` suffix. `Extension` / `ExtensionPreferences` subclasses MUST be the default export. | `[Port-guide 45]` |
-| I-10 | Two import blocks, each alphabetically sorted: `gi://` and GJS built-ins first, then `resource://` and relative imports. No unused imports. | `[Best-practice]` |
+| I-10 | Two import blocks, each alphabetically sorted: `gi://` and GJS built-ins first, then `resource://` and relative imports. No unused imports. | `[Convention]` |
 | I-11 | Code MUST NOT use `Extension.lookupByURL()` / `lookupByUUID()` (or the `ExtensionPreferences` equivalents) to reach the current extension; use `this`, `this.getSettings()`, `this.path`, `this.dir`, `this.metadata`, `this.uuid`. | `[Shexli EGO-X-006]` |
-| I-12 | Dynamic `import()` of optional GI libraries MUST be justified in the PR description and documented in the README; reviewers will ask. | `[Project]` |
+| I-12 | The README documents every dynamic `import()` of an optional GI library: which library, which feature needs it, and which package provides it. A reviewer who sees the `import()` can then find why it is there. | `[Project]` |
 
 Reference imports:
 
@@ -468,7 +471,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
-import Soup from 'gi://Soup?version=3.0';
+import Soup from 'gi://Soup';
 import St from 'gi://St';
 
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
@@ -483,7 +486,7 @@ import {Foo} from './lib/foo.js';
 // prefs.js (runs in a separate gjs/GTK process)
 import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
-import Gtk from 'gi://Gtk?version=4.0';
+import Gtk from 'gi://Gtk';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 ```
@@ -658,18 +661,18 @@ https://gjs.guide/guides/gio/dbus.html.
 | X-7  | Installing modules from pip, npm, yarn or similar "MUST require explicit user action, such as a button in preferences". Never at enable time. | `[EGO-reject]` |
 | X-8  | "Spawning privileged subprocesses should be avoided at all costs. If absolutely necessary, the subprocess MUST be run with pkexec and MUST NOT be an executable or script that can be modified by a user process." `sudo`, `su`, `doas`, `run0` MUST NOT appear in argv. | `[EGO-reject]` `[Shexli EGO-X-001]` |
 | X-9  | "Extensions MUST NOT use any telemetry tools to track users and share the user data online." Polling the user's own accounts is not telemetry, but the description SHOULD name the hosts contacted. | `[EGO-reject]` `[Shexli EGO-A-003]` |
-| X-10 | Networking uses Soup 3: one session per `enable()` (R-13), `send_and_read_async()` with a cancellable, never `send_and_read()` (sync). Check `message.get_status()`; decode with `TextDecoder`. Streaming large bodies: `send_async()` + `Gio.InputStream`. Set `timeout` and a `user_agent`. | `[Best-practice]` |
+| X-10 | Networking uses Soup 3: one session per `enable()` (R-13), `send_and_read_async()` with a cancellable, never `send_and_read()` (sync). Check `message.get_status()`; decode with `TextDecoder`. Streaming large bodies: `send_async()` + `Gio.InputStream`. A session `timeout` and a `user_agent` are advisable but no review page asks for them (this project's reason for its User-Agent is in AGENTS.md). | `[Best-practice]` |
 | X-11 | Files: `this.dir.get_child(name)` / `this.path` for bundled assets; `GLib.get_user_config_dir()`, `GLib.get_user_cache_dir()`, `GLib.build_filenamev([...])` for user paths. Decode with `TextDecoder`, never `ByteArray`. | `[Best-practice]` |
-| X-12 | Reading other applications' files MUST be async, tolerant of absence, read-only, and MUST never write to them without explicit user action. | `[Best-practice]` |
+| X-12 | Reading other applications' files MUST be async, tolerant of absence, read-only, and MUST never write to them without explicit user action. | `[Project]` |
 | X-13 | D-Bus: `Gio.DBusProxy.makeProxyWrapper(xml)` and construct the proxy asynchronously (callback form or `new_for_bus`); `connectSignal` / `disconnectSignal`; `Gio.bus_unown_name()` and `unexport()` in `disable()`. Always invoke the wrapper with `new` (required on 51, works on 50). | `[Best-practice]` `[Port-guide 51]` |
-| X-14 | Secrets (tokens, passwords) SHOULD NOT be stored in GSettings (dconf is plaintext); prefer libsecret (`gi://Secret?version=1`, async `Secret.password_store` / `password_lookup`) or document the risk. This is platform convention, not an EGO rule. | `[Best-practice]` |
+| X-14 | Secrets (tokens, passwords) SHOULD NOT be stored in GSettings (dconf is plaintext); prefer libsecret (`gi://Secret?version=1`, async `Secret.password_store` / `password_lookup`) or document the risk. This is platform convention, not an EGO rule. | `[Convention]` |
 
 Reference (promisified Soup 3 and file read):
 
 ```js
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import Soup from 'gi://Soup?version=3.0';
+import Soup from 'gi://Soup';
 
 // Module scope is allowed: this patches a prototype and creates no object.
 Gio._promisify(Soup.Session.prototype, 'send_and_read_async', 'send_and_read_finish');
@@ -714,14 +717,14 @@ https://developer.gnome.org/hig/patterns/feedback/notifications.html.
 | UI-6  | Colours: `Cogl.Color`, not `Clutter.Color` (47). Images: `St.ImageContent`, not `Clutter.Image` (48). Rectangles: `Mtk.Rectangle`, not `Meta.Rectangle` (49). Gestures: `Clutter.ClickGesture` / `LongPressGesture`, not `ClickAction` / `TapAction` (49). | `[Port-guide 47]` `[Port-guide 48]` `[Port-guide 49]` |
 | UI-7  | Do not start using what 51 removes or deprecates: raw `button-press-event` / `key-press-event` signals (use `Clutter.ClickGesture`, `KeyController`, `ScrollController`, `MotionController` via `actor.add_action()`); `St.ButtonMask.ONE/TWO/THREE` (use `PRIMARY/MIDDLE/SECONDARY`); `menu.close(PopupAnimation.NONE)` (use `menu.close({animate: false})`); `Clutter.get_default_backend()` (use `global.stage.context.get_backend()`); `Shell.GLSLEffect`; `ui/pointerWatcher.js` (use `global.backend.get_cursor_tracker()`). | `[Port-guide 51]` |
 | UI-8  | `global` accessors on 48+: `global.compositor.get_window_actors()` (not `Meta.get_window_actors`), `global.backend.get_cursor_tracker()` (not `Meta.CursorTracker.get_for_display`), `global.stage`, `global.display`, `global.settings`, `global.get_current_time()`. | `[Port-guide 48]` |
-| UI-9  | Popup menus: `PopupMenu.PopupMenuItem`, `PopupSeparatorMenuItem`, `PopupSwitchMenuItem`, `PopupSubMenuMenuItem`, `PopupMenuSection`, `menu.addAction(title, cb, icon)`, `setOrnament(PopupMenu.Ornament.*)`. Many PopupMenu classes are plain `EventEmitter`s (no property bindings). A "Settings" entry calls `extension.openPreferences()` and is visible only when `Main.sessionMode.allowSettings`. | `[Best-practice]` |
+| UI-9  | Popup menus: `PopupMenu.PopupMenuItem`, `PopupSeparatorMenuItem`, `PopupSwitchMenuItem`, `PopupSubMenuMenuItem`, `PopupMenuSection`, `menu.addAction(title, cb, icon)`, `setOrnament(PopupMenu.Ornament.*)`. Many PopupMenu classes are plain `EventEmitter`s (no property bindings). A "Settings" entry calls `extension.openPreferences()` and is visible only when `Main.sessionMode.allowSettings`. | `[Reference]` |
 | UI-10 | Styling goes through `style_class` and the stylesheet (selectors by `GTypeName` work). Use theme variables (`-st-accent-color`, `-st-accent-fg-color` on 47+) rather than hard-coded colours. | `[Port-guide 47]` |
 | UI-11 | Animation: `actor.ease({duration, mode, onComplete})`; on 50 `actor.easeAsync({...})` returns a Promise that rejects with CANCELLED when interrupted. Respect reduced motion (`St.Settings.get().reducedMotion` on 51). | `[Port-guide 50]` `[Port-guide 51]` |
 | UI-12 | Accessibility: set `accessible_name` on buttons and icon-only controls; link labels with `label-actor`; `can_focus` for keyboard reachability; every control reachable by keyboard; test with large text and high contrast. | `[Best-practice]` `[HIG]` |
 | UI-13 | `GObject.registerClass` options: if `GTypeName` is set it MUST be unique process-wide (prefix with the extension name). Register at module scope; re-registering the same name throws. Property names kebab-case in strings (`'notify::use-markup'`). Emit `this.notify('prop')` in custom setters. | `[Best-practice]` |
 | UI-14 | Notifications (46+): property-object constructors `new MessageTray.Source({title, iconName \| icon, policy})` and `new MessageTray.Notification({source, title, body, iconName \| gicon, urgency})`; `source.addNotification(n)`; `n.addAction(label, cb)` (max 3; 48 adds `removeAction()`); `Main.messageTray.add(source)`. Create the source lazily, re-create after its `destroy` signal, and destroy it in `disable()` (`this._source?.destroy(); this._source = null;`). `Main.notify()` / `Main.notifyError()` for the simple case. | `[Port-guide 46]` `[Port-guide 48]` |
 | UI-15 | Notification content: short title in header capitalization; one-sentence body in sentence case; rate-limit (summaries, not per-event spam); let users disable them; remove stale ones; do not duplicate the default action as a button. | `[HIG]` |
-| UI-16 | Cursor: do not leave the global cursor changed. If `global.stage.set_cursor_type()` is used, reset it to `Clutter.CursorType.DEFAULT` when the pointer leaves the actor and in `destroy()`. | `[Best-practice]` |
+| UI-16 | Cursor: on GNOME 50, set the cursor on the actor itself with `actor.set_cursor_type(Clutter.CursorType.POINTER)`. It applies only while the pointer is over that actor (Shell does this in `js/ui/messageList.js`). Do not change the cursor of `global.stage`: actors inherit their parent's cursor, so a stage cursor changes it everywhere. If that is ever unavoidable, reset it to `Clutter.CursorType.DEFAULT` when the pointer leaves and in `destroy()`. | `[Reference]` |
 
 Reference custom-source notification:
 
@@ -780,12 +783,12 @@ https://developer.gnome.org/hig/patterns/containers/boxed-lists.html.
 | PR-1  | Implement `fillPreferencesWindow(window)` on the default-exported `ExtensionPreferences` subclass. `getPreferencesWidget()` MUST NOT be used on 45+ (it is ignored when `fillPreferencesWindow` exists and is flagged). `fillPreferencesWindow` MAY be `async` (awaited since 47). | `[Best-practice]` `[Shexli EGO-C45-001]` `[Port-guide 47]` |
 | PR-2  | The window is an `Adw.PreferencesWindow`. Structure: `Adw.PreferencesPage` → `Adw.PreferencesGroup` → rows (`Adw.SwitchRow`, `ActionRow`, `ComboRow`, `SpinRow`, `EntryRow`, `ExpanderRow`, `ButtonRow`). | `[Best-practice]` |
 | PR-3  | Window-scoped objects MUST NOT be stored on `this` without cleanup. Keep per-window state on the window (`window._settings = settings`) or local, or connect `window.connect('close-request', () => { … clear fields … })`. | `[Shexli EGO-L-006]` |
-| PR-4  | Custom CSS: the extension `stylesheet.css` does not apply to prefs. If CSS is truly needed, load it with `Gtk.CssProvider` + `Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)` and remove it on `close-request`. Prefer libadwaita style classes over custom CSS. | `[Best-practice]` `[HIG]` |
+| PR-4  | Custom CSS: the extension `stylesheet.css` does not apply to prefs. If CSS is truly needed, load it with `Gtk.CssProvider` + `Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)` and remove it on `close-request`. Prefer libadwaita style classes over custom CSS. | `[Best-practice]` |
 | PR-5  | Bind settings with `settings.bind(key, widget, property, Gio.SettingsBindFlags.DEFAULT)`; for non-bindable state connect `changed::<key>` and disconnect on window close. | `[Best-practice]` |
 | PR-6  | HIG writing: titles, buttons and menu labels in Header Capitalization ("Show Cost", "Add Account…"); subtitles and explanatory text in sentence case without trailing period; ellipsis (`…`) on actions that need further input; avoid "e.g." / "i.e."; US English. | `[HIG]` |
 | PR-7  | Rows: one control (at most two) per row; the control, not the row, is focusable; navigation rows end with `go-next-symbolic`. Icons via `Gtk.Image` / `icon_name` with `-symbolic` names, never emoji. | `[HIG]` `[Best-practice]` |
 | PR-8  | Prefs code MUST NOT import Shell libraries or reach Shell objects (I-4). Prefs-only helpers live in `prefs/` (I-6). | `[EGO-reject]` `[Best-practice]` |
-| PR-9  | Synchronous I/O is tolerated in the prefs process but MUST stay small and user-triggered; the prefs process is still a UI process. | `[Best-practice]` |
+| PR-9 | Shexli does not check synchronous I/O in the prefs process (its sync-I/O rule EGO-X-004 runs only on extension-process files), and no review page allows it either. Keep it small and triggered by a user action, because the prefs window is still a UI process; prefer the async API where it costs little. | `[Project]` |
 | PR-10 | Prefs text and UI MUST work for LTR and RTL; never build sentences across controls. Follow the HIG for prefs ("recommended but not required for approval"; treated as MUST here). | `[HIG]` |
 
 Reference:
@@ -836,7 +839,7 @@ in Metadata"), anatomy page, Shexli package rules.
 | S-3  | "Schema XML file MUST be included in the extension ZIP file" whenever the code uses GSettings. | `[EGO-reject]` `[Shexli EGO-P-003]` |
 | S-4  | "Schema XML filename MUST follow pattern of `<schema-id>.gschema.xml`." | `[EGO-reject]` `[Shexli EGO-P-004]` |
 | S-5  | `schemas/gschemas.compiled` MUST NOT ship (compiled on install since GNOME 44). | `[Shexli EGO-P-006]` |
-| S-6  | Declare `settings-schema` in `metadata.json` and call `this.getSettings()` with no arguments (Q-9). `getSettings()` builds a `Gio.SettingsSchemaSource` from `<ext>/schemas/` and throws if the schema is missing. Never `new Gio.Settings({schema_id})` in extension code. | `[Best-practice]` |
+| S-6  | Declare `settings-schema` in `metadata.json` and call `this.getSettings()` with no arguments for the extension's own schema (Q-9). `getSettings()` builds a `Gio.SettingsSchemaSource` from `<ext>/schemas/` and throws if the schema is missing. Do not open the extension's own schema with `new Gio.Settings({schema_id})`; system schemas (for example `org.gnome.desktop.interface`) are read with `new Gio.Settings` as usual. | `[Best-practice]` |
 | S-7  | One `Gio.Settings` instance per process: create in `enable()` / `fillPreferencesWindow()`, null in `disable()`. Never at module scope. | `[EGO-reject]` `[Shexli EGO-L-001/005]` |
 | S-8  | Keys use kebab-case. Structured data as `s` (JSON string), `as` or `a{ss}`. No secrets in GSettings (X-14). | `[Best-practice]` |
 | S-9  | Read with `get_boolean` / `get_int` / `get_string` / `get_strv`; write with `set_*`; observe with `changed::<key>` or `bind()`. | `[Best-practice]` |
@@ -876,12 +879,12 @@ Appendix.
 | TS-2  | "If the codebase of an extension is too messy to properly review it MAY be rejected. This includes obfuscators and transpilers used with TypeScript." Reviewers have refused minified bundles ("I won't review minified code") and a single ~10,000-line bundle. | `[EGO-reject]` |
 | TS-3  | Prefer per-file emission that mirrors the source tree (`tsc`, or esbuild without `--bundle`), so the shipped `.js` tree keeps module boundaries, original import names, `const`/`let`, comments and a small `extension.js`. Avoid giant bundles. | `[Best-practice]` |
 | TS-4  | Transpiler artifacts MUST NOT appear in shipped code: top-level `const` → `var`, renamed duplicate imports (`Gio2`, `GLib8`), imports scattered mid-file, helper shims (`__defProp`, `__publicField`), polyfills. Set `target` ≥ ES2022 (SpiderMonkey 140 on GNOME 49/50 supports ES2023), `useDefineForClassFields` consistent with no shims, no decorators. | `[EGO-reject]` |
-| TS-5  | If esbuild is used: `--format=esm --platform=neutral --target=es2023 --external:gi://* --external:resource://*`, no `--minify*`, `--keep-names` is unnecessary when nothing is mangled, no `--drop:console`, keep comments. Then format the output to GNOME style (4-space, single quotes, semicolons) and lint it. | `[Best-practice]` |
+| TS-5  | If esbuild is used: `--format=esm --platform=neutral --target=es2023 --external:gi://* --external:resource://*`, no `--minify*`, `--keep-names` is unnecessary when nothing is mangled, no `--drop:console`, keep comments. Then format the output to GNOME style (4-space, single quotes, semicolons) and lint it. | `[Convention]` |
 | TS-6  | No Node APIs in output: no `process`, `require`, `node:` imports, `import.meta.dirname`, `Buffer`. They crash at runtime in GJS. | `[Best-practice]` |
 | TS-7  | Entry files (`extension.js`, `prefs.js`, `metadata.json`) at the zip root (P-2). The `url` field points at the repository containing the `.ts` source. | `[Best-practice]` |
-| TS-8  | Lint what ships: ESLint with the GNOME Shell rules runs over the emitted `.js`, since that is what reviewers read. | `[EGO-reject]` |
-| TS-9  | `.ts` sources, `.d.ts`, source maps, `tsconfig*`, `node_modules` MUST NOT be in the zip (`sourceMap: false`). | `[EGO-reject]` |
-| TS-10 | Recommended `tsconfig`: `module: NodeNext`, `target: ES2023`, `lib: ES2023`, `strict`, `skipLibCheck`, `sourceMap: false`, `outDir: dist`; ambient types `@girs/gjs`, `@girs/gjs/dom`, `@girs/gnome-shell/ambient`, `@girs/gnome-shell/extensions/global`. | `[Best-practice]` |
+| TS-8  | Lint what ships: ESLint with the GNOME Shell rules runs over the emitted `.js`, since that is what reviewers read. The Review Guidelines recommend a linter and add that "Following a specific code style is not a requirement for approval". | `[EGO-recommendation]` `[Project]` |
+| TS-9  | Keep `.ts` sources, `.d.ts`, source maps, `tsconfig*` and `node_modules` out of the zip (`sourceMap: false`). Submissions "should not include files that are not necessary for it to function", and a reviewer "MAY decide to reject an extension which includes an unreasonable amount of unnecessary data". | `[EGO-recommendation]` `[Project]` |
+| TS-10 | Recommended `tsconfig`: `module: NodeNext`, `target: ES2023`, `lib: ES2023`, `strict`, `skipLibCheck`, `sourceMap: false`, `outDir: dist`; ambient types `@girs/gjs`, `@girs/gjs/dom`, `@girs/gnome-shell/ambient`, `@girs/gnome-shell/extensions/global`. | `[Reference]` |
 | TS-11 | `// @ts-nocheck` and `// @ts-ignore` defeat the point of TypeScript; GJS-facing files MUST be type-checked with the `@girs` typings for the targeted Shell version. | `[Project]` |
 | TS-12 | Vendored dependencies in output MUST be minimal, readable, GPL-compatible and attributed (Section 15). | `[EGO-reject]` |
 
@@ -895,7 +898,7 @@ Sources: https://gjs.guide/extensions/upgrading/ (45–51), https://release.gnom
 |-----|------|--------|
 | V-1 | Target exactly one GNOME Shell version (currently 50) and write code for that version only (Q-3). `shell-version` lists only what was tested (M-2). | `[Best-practice]` |
 | V-2 | Do not start using anything a newer port guide removes or deprecates (UI-7, L-3). Write 50 code that is already 51-clean. | `[Port-guide 51]` |
-| V-3 | When bumping the target, read the port guide for every intermediate version and apply each change; then re-run Shexli and the nested-shell test. | `[Best-practice]` |
+| V-3 | When bumping the target, read the port guide for every intermediate version and apply each change; then re-run Shexli and the nested-shell test. | `[Convention]` |
 
 | Version | Change | Action |
 |---------|--------|--------|
@@ -925,7 +928,7 @@ https://conduct.gnome.org.
 | LE-5 | "Extensions MUST NOT promote national or international political agendas." | `[EGO-reject]` |
 | LE-6 | Clipboard: access MUST be declared in the description; data MUST NOT be shared with a third party without explicit user interaction; no default keyboard shortcuts for clipboard data. `St.Clipboard.get_default()` triggers manual review. | `[EGO-reject]` `[Shexli EGO-A-005]` |
 | LE-7 | No telemetry (X-9). | `[EGO-reject]` |
-| LE-8 | Translations: do not ship `po/`, `.po`, `.pot`; ship compiled `locale/*.mo` only via `gnome-extensions pack --podir=po`. Use `gettext as _`, `ngettext`, `pgettext` from the resource modules; `String.prototype.format` only with gettext strings. | `[EGO-reject]` `[Best-practice]` |
+| LE-8 | Translations: do not ship `po/`, `.po` or `.pot` (the Review Guidelines list ".po and .pot files" as unnecessary). Ship compiled `locale/<lang>/LC_MESSAGES/*.mo`; `gnome-extensions pack` builds them from `po/` (P-8). Use `gettext as _`, `ngettext`, `pgettext` from the resource modules; `String.prototype.format` only with gettext strings. | `[EGO-recommendation]` `[Best-practice]` |
 | LE-9 | Extensions MUST be functional: "if an extension is tested and found to be fundamentally broken it will be rejected. Extensions which serve no purpose or have no functionality will also be rejected." | `[EGO-reject]` |
 
 ---
@@ -1084,10 +1087,10 @@ gnome-extensions upload --accept-tos --user <user> --password-file <file> <zip>
 
 | ID  | Rule | Origin |
 |-----|------|--------|
-| E-1 | Replies in the review thread are written by the human maintainer (AI-8). | `[EGO-reject]` |
-| E-2 | Be ready to explain every line a reviewer asks about, with reference to this file or the gjs.guide page it came from. | `[EGO-reject]` |
+| E-1 | Replies in the review thread are written by the human maintainer (AI-8). | `[Reviewer blog]` |
+| E-2 | Be ready to explain any line a reviewer asks about, in your own words: developers "should be able to justify and explain the code they submit, within reason". Point to the gjs.guide page or the Shell source behind a choice. Do not point to this file; it is not an EGO source. | `[EGO-reject]` |
 | E-3 | Fix every flagged item in the next upload; do not argue warnings that are cheap to fix. For `manual_review` findings, give the reviewer the real-world reason in one or two sentences. | `[Shexli]` |
-| E-4 | Keep `url` pointing at the public repository with testing instructions and history; reviewers may read it. | `[EGO-reject]` |
+| E-4 | `url` in `metadata.json` points to the public repository, so a reviewer can see where the code comes from: it "should be a link to a Github or GitLab repository where users can report problems and learn more about your extension". | `[EGO-recommendation]` |
 | E-5 | Where to ask for help: Matrix https://matrix.to/#/#extensions:gnome.org, https://discourse.gnome.org (tag `extensions`), Stack Overflow (`gnome-shell-extensions`, `gjs`). | `[Best-practice]` |
 | E-6 | Do not submit a new version while a previous one is still under review unless the reviewer asked for it. | `[Project]` |
 
@@ -1119,8 +1122,8 @@ Lifecycle
 Resources
 
 - [ ] All handler ids disconnected; `Gio.Settings` signals released explicitly (R-1, R-2).
-- [ ] All sources removed even if they return `SOURCE_REMOVE`; removal next to creation
-      (R-6 … R-9).
+- [ ] All sources removed even if they return `SOURCE_REMOVE`; removal next to creation;
+      a timeout that bounds an async call is removed when its cancellable fires (R-6 … R-9).
 - [ ] One cancellable and one Soup session per enable, cancelled / aborted in disable
       (R-11, R-13).
 - [ ] No `run_dispose()`, no `imports._gi`; injections via `InjectionManager` with `clear()`
@@ -1131,6 +1134,7 @@ Imports and processes
 - [ ] No Gtk/Gdk/Adw in Shell code; no Clutter/Meta/St/Shell in prefs; shared modules import
       neither (I-3 … I-5).
 - [ ] No deprecated modules, no legacy `imports`, no `lookupByURL/UUID` (I-1, I-2, I-11).
+- [ ] `?version=` only on GI libraries the process does not already load (I-7).
 - [ ] Prefs-only modules in `prefs/` (I-6).
 
 Code quality
@@ -1236,6 +1240,18 @@ GNOME Shell / GJS sources and release notes
 - libsoup 3 migration: https://libsoup.gnome.org/libsoup-3.0/migrating-from-libsoup-2.html
 - `gnome-extensions(1)`: https://man.archlinux.org/man/gnome-extensions.1.en
 
+Re-check of 2026-11-04 (GNOME 50 branches)
+
+- gjs.guide raw Markdown and sample files: https://gitlab.gnome.org/World/javascript/gjs-guide
+  (`docs/`, `src/`)
+- GNOME Shell `gnome-50`: `subprojects/extensions-tool/src/command-pack.c` (P-8),
+  `js/misc/signalTracker.js` (R-2), `js/ui/messageList.js` (UI-16), `js/ui/extensionSystem.js`
+  (P-2, L-5, L-15), `js/misc/dependencies.js` (preloaded GI libraries)
+- mutter `gnome-50`: `clutter/clutter/clutter-actor.c` (cursor inheritance, UI-16)
+- Shexli 0.2.1: `shexli/analyzer/rules/api_misuse.py` (EGO-X-004 scope, PR-9)
+- "Help EGO team" post, raw HTML: the "real public repository" sentence is inside the
+  `<blockquote>` of pasted LLM output (section 1, AI-9, E-4)
+
 HIG
 
 - UI icons: https://developer.gnome.org/hig/guidelines/ui-icons.html
@@ -1256,4 +1272,4 @@ Attribution
 
 Code examples in this file are adapted from gjs.guide (MIT licensed, "GJS, A GNOME Project")
 and from the jrahmatzadeh blog posts listed above. Rule wording in quotation marks is quoted
-from those pages as they read on 2026-10-13.
+from those pages as they read on 2026-10-13, or on 2026-11-04 for the rules re-checked then.
