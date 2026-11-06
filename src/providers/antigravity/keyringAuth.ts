@@ -25,20 +25,31 @@ async function importSecret(): Promise<typeof Secret> {
 
 // Never asks the keyring to unlock: a password prompt during a background
 // refresh would be hostile, so a locked keyring counts as unavailable.
-export async function lookupAgyKeyringToken(cancellable: Gio.Cancellable | null): Promise<AgyKeyringToken | null> {
+export async function lookupAgyKeyringToken(cancellable: Gio.Cancellable): Promise<AgyKeyringToken | null> {
     const Secret = await importSecret();
     const schema = Secret.Schema.new(AGY_KEYRING_SCHEMA, Secret.SchemaFlags.NONE, {
         service: Secret.SchemaAttributeType.STRING,
         username: Secret.SchemaAttributeType.STRING,
     });
     const lookup = new Gio.Cancellable();
-    const parentId = cancellable ? cancellable.connect(() => lookup.cancel()) : 0;
     let timedOut = false;
     let timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, LOOKUP_TIMEOUT_MS, () => {
         timeoutId = 0;
         timedOut = true;
         lookup.cancel();
         return GLib.SOURCE_REMOVE;
+    });
+    const removeTimeout = () => {
+        if (timeoutId) {
+            GLib.Source.remove(timeoutId);
+            timeoutId = 0;
+        }
+    };
+    // Connected after the timeout exists: connect() runs the handler at once
+    // when the cancellable is already cancelled.
+    const parentId = cancellable.connect(() => {
+        removeTimeout();
+        lookup.cancel();
     });
     let raw: string | null;
     try {
@@ -48,10 +59,8 @@ export async function lookupAgyKeyringToken(cancellable: Gio.Cancellable | null)
             throw error;
         throw new CollectorError('dependency', KEYRING_UNAVAILABLE);
     } finally {
-        if (timeoutId)
-            GLib.Source.remove(timeoutId);
-        if (cancellable)
-            cancellable.disconnect(parentId);
+        removeTimeout();
+        cancellable.disconnect(parentId);
     }
     if (!raw)
         return null;

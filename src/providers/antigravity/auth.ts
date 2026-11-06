@@ -60,7 +60,7 @@ async function loadFileAuth(instance: ProviderInstance, cancellable: Gio.Cancell
     throw notSignedIn();
 }
 
-async function loadKeyringAuth(cancellable: Gio.Cancellable | null): Promise<AntigravityAuth | null> {
+async function loadKeyringAuth(cancellable: Gio.Cancellable): Promise<AntigravityAuth | null> {
     const token = await lookupAgyKeyringToken(cancellable);
     if (!token)
         return null;
@@ -78,7 +78,7 @@ function settle<T>(promise: Promise<T>): Promise<{value: T | null; error: unknow
 // A usable credential file wins, because it can be refreshed without the user.
 // Otherwise a live keyring token takes over from a stale file, so an account
 // signed in through agy keeps working.
-export async function resolveAntigravityAuth(instance: ProviderInstance, cancellable: Gio.Cancellable | null): Promise<AntigravityAuth> {
+export async function resolveAntigravityAuth(instance: ProviderInstance, cancellable: Gio.Cancellable): Promise<AntigravityAuth> {
     const file = await settle(loadFileAuth(instance, cancellable));
     if (file.value && (isAntigravityTokenFresh(file.value) || isAntigravityRefreshable(file.value)))
         return file.value;
@@ -91,7 +91,7 @@ export async function resolveAntigravityAuth(instance: ProviderInstance, cancell
     throw keyring.error ?? file.error;
 }
 
-export async function antigravityCredentialStatus(instance: ProviderInstance, cancellable: Gio.Cancellable | null): Promise<CredentialStatus> {
+export async function antigravityCredentialStatus(instance: ProviderInstance, cancellable: Gio.Cancellable): Promise<CredentialStatus> {
     let auth: AntigravityAuth;
     try {
         auth = await resolveAntigravityAuth(instance, cancellable);

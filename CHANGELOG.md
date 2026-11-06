@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1
+
+Bug fixes:
+
+- The Antigravity keyring check removes its timer as soon as Token Grill is disabled or the
+  preferences window closes.
+
 ## 0.3.0
 
 - The popup and the preferences window use the standard GNOME interface. They

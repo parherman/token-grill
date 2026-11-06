@@ -1,5 +1,5 @@
 import Gio from 'gi://Gio';
-import Soup from 'gi://Soup?version=3.0';
+import Soup from 'gi://Soup';
 
 import type {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
