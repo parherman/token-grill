@@ -3,7 +3,7 @@
 ## Unreleased
 
 - Support GNOME Shell 51.
-- Hide unavailable weekly quotas in the popup.
+- Hide unavailable quotas in the popup.
 
 ## 0.3.1
 
