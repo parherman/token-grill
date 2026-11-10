@@ -35,6 +35,7 @@ function normalizeWindow(window: Record<string, unknown>, name: string, index: n
         limit: null,
         percent: clampFraction(percentagePoints / 100),
         resetAt: toEpochMs(window.reset_at),
+        durationSeconds: numberAt(window, 'limit_window_seconds'),
         unit: null,
     };
 }

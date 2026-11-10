@@ -12,7 +12,7 @@ import * as BarLevel from 'resource:///org/gnome/shell/ui/barLevel.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import {displayLabel, displayPercent, pressureClass, selectWindow} from '../core/display.js';
 import {historyMetrics} from '../core/historyMetrics.js';
-import {creditExpiryText, errorText, historySummary, refreshStatusText, windowCaption} from '../core/popupModel.js';
+import {creditExpiryText, errorText, historySummary, refreshStatusText, windowCaption, windowPace} from '../core/popupModel.js';
 import {providerMetadata} from '../core/providerMetadata.js';
 import type {
     CanonicalQuotaWindow,
@@ -160,6 +160,7 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
     private _value: St.Label;
     private _meter: BarLevel.BarLevel;
     private _caption: St.Label;
+    private _pace: St.Label;
 
     constructor(title: string, onSelect: () => void) {
         super({style_class: 'tokengrill-window-item'});
@@ -184,9 +185,11 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
             accessible_name: _('%s usage').format(title),
         });
         this._caption = wrappingLabel('tokengrill-caption');
+        this._pace = wrappingLabel('tokengrill-caption');
         box.add_child(head);
         box.add_child(this._meter);
         box.add_child(this._caption);
+        box.add_child(this._pace);
         this.add_child(box);
         this.label_actor = nameLabel;
     }
@@ -195,7 +198,7 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
         this._onSelect();
     }
 
-    update(window: UsageWindow | null, mode: PanelPercentageMode, selected: boolean): void {
+    update(window: UsageWindow | null, mode: PanelPercentageMode, selected: boolean, state: ProviderSnapshot['state'] | undefined): void {
         const percent = displayPercent(window, mode);
         const pressure = pressureClass(window);
         const value = window ? displayLabel(TRANSLATOR, window, mode) : _('Unavailable');
@@ -203,6 +206,9 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
         this._meter.value = percent ?? 0;
         this._meter.visible = percent !== null;
         this._caption.set_text(windowCaption(TRANSLATOR, window, dateTimeLabel));
+        const pace = state === 'ready' ? windowPace(TRANSLATOR, window) : null;
+        this._pace.set_text(pace ?? '');
+        this._pace.visible = pace !== null;
         // Pressure is shown with an icon as well as the number, never colour alone.
         this._warning.visible = pressure !== 'neutral';
         this.setOrnament(selected ? PopupMenu.Ornament.DOT : PopupMenu.Ornament.NO_DOT);
@@ -210,6 +216,8 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
         const parts = [this._title, value];
         if (window)
             parts.push(this._caption.text);
+        if (pace)
+            parts.push(pace);
         if (pressure === 'critical')
             parts.push(_('almost exhausted'));
         else if (pressure === 'warning')
@@ -323,7 +331,7 @@ export class ProviderDetail extends PopupMenu.PopupMenuSection {
             if (!item.visible)
                 continue;
             const selected = preference === canonical || automatic?.canonicalWindow === canonical;
-            item.update(window, mode, selected);
+            item.update(window, mode, selected, snapshot?.state);
         }
 
         this._updateCredits(snapshot?.resetCredits ?? null);

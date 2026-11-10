@@ -201,6 +201,7 @@ export class TokenGrillIndicator extends PanelMenu.Button {
     private _ui: IndicatorParts | null;
     private _themeContext: St.ThemeContext | null;
     private _themeChangedId: number | null;
+    private _state: IndicatorState | null = null;
 
     constructor(extensionPath: string, controller: IndicatorController) {
         super(0.5, _('Token Grill'));
@@ -233,6 +234,10 @@ export class TokenGrillIndicator extends PanelMenu.Button {
         if (Main.sessionMode.allowSettings)
             menu.addAction(_('Preferences…'), () => controller.openPreferences());
         this._ui = {panelBox, menuBox, chooser, chooserSeparator, detail, empty, refreshAll, automatic};
+        menu.connectObject('open-state-changed', (_menu: PopupMenu.PopupMenu, open: boolean) => {
+            if (open && this._state)
+                this._renderMenu(this._state);
+        }, this);
 
         this._themeContext = St.ThemeContext.get_for_stage(global.stage);
         this._themeChangedId = this._themeContext.connect('changed', () => this._updateThemeClasses());
@@ -254,6 +259,7 @@ export class TokenGrillIndicator extends PanelMenu.Button {
     }
 
     update(state: IndicatorState): void {
+        this._state = state;
         this._updateThemeClasses();
         this._renderPanel(state);
         this._renderMenu(state);
@@ -300,6 +306,7 @@ export class TokenGrillIndicator extends PanelMenu.Button {
     }
 
     override destroy(): void {
+        this._state = null;
         this._themeContext!.disconnect(this._themeChangedId!);
         this._themeChangedId = null;
         this._themeContext = null;

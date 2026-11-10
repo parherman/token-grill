@@ -73,6 +73,28 @@ function quotaValueLabel(tr: Translator, window: Partial<UsageWindow>): string {
     return formatText(_('%s of %s credits'), used, formatQuotaNumber(window.limit));
 }
 
+export function windowPace(tr: Translator, window: Partial<UsageWindow> | null, now = Date.now()): string | null {
+    if (!window || window.percent == null || !Number.isFinite(window.percent) || window.percent < 0 || window.percent > 1)
+        return null;
+    let seconds = window.durationSeconds ?? null;
+    if (seconds === null && window.canonicalWindow === 'five-hour')
+        seconds = 18000;
+    else if (seconds === null && window.canonicalWindow === 'weekly')
+        seconds = 604800;
+    if (seconds === null || seconds <= 0 || !Number.isFinite(seconds * 1000) || window.resetAt == null || !Number.isFinite(window.resetAt) || !Number.isFinite(now))
+        return null;
+    const start = window.resetAt - seconds * 1000;
+    if (now < start || now >= window.resetAt)
+        return null;
+    const reserve = Math.round(((now - start) / (seconds * 1000) - window.percent) * 100);
+    const {_} = tr;
+    if (reserve > 0)
+        return formatText(_('%d%% in reserve'), reserve);
+    if (reserve < 0)
+        return formatText(_('%d%% ahead of pace'), -reserve);
+    return _('On pace');
+}
+
 export function windowCaption(tr: Translator, window: Partial<UsageWindow> | null, dateTime: (timestamp: number) => string, now = Date.now()): string {
     const {_} = tr;
     if (!window)

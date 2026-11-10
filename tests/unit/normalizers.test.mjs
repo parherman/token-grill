@@ -11,6 +11,7 @@ test('Codex weekly-only response is a valid weekly window', () => {
     assert.equal(result.windows[0].canonicalWindow, 'weekly');
     assert.equal(result.windows[0].percent, 0.26);
     assert.equal(result.windows[0].resetAt, 1786598031000);
+    assert.equal(result.windows[0].durationSeconds, 604800);
 });
 
 test('Codex duration, rather than primary/secondary naming, identifies windows', () => {
@@ -18,6 +19,12 @@ test('Codex duration, rather than primary/secondary naming, identifies windows',
     assert.deepEqual(result.windows.map(window => window.canonicalWindow), ['five-hour', 'weekly']);
     assert.equal(result.windows[0].percent, 0.4);
     assert.equal(result.windows[1].percent, 1);
+});
+
+test('Codex retains the actual duration of a quota classified as five-hour', () => {
+    const result = normalizeCodexUsage({rate_limit: {primary_window: {used_percent: 46, limit_window_seconds: 10800}}});
+    assert.equal(result.windows[0].canonicalWindow, 'five-hour');
+    assert.equal(result.windows[0].durationSeconds, 10800);
 });
 
 test('Codex percentage-point fields handle values at and below one percent', () => {
