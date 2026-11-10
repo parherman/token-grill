@@ -2,9 +2,51 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {ACCENT_COLORS, accentStyleClass, normalizeAccent} from '../../build/tests/accent.mjs';
 import {UNTRANSLATED} from '../../build/tests/i18n.mjs';
-import {accountGroups, creditExpiryText, errorText, historySummary, refreshStatusText, shortAccountName, windowCaption} from '../../build/tests/popup-model.mjs';
+import {accountGroups, creditExpiryText, errorText, historySummary, refreshStatusText, shortAccountName, windowCaption, windowPace} from '../../build/tests/popup-model.mjs';
 
 const provider = (id, kind, displayName, extra = {}) => ({id, kind, displayName, enabled: true, accent: 'blue', localHistoryEnabled: false, panelWindowPreference: 'automatic', ...extra});
+
+test('quota pace compares used quota with elapsed time in percentage points', () => {
+    const now = Date.parse('2026-11-10T12:00:00Z');
+    const window = {canonicalWindow: 'weekly', percent: 0.46, resetAt: now + 302400000};
+    assert.equal(windowPace(UNTRANSLATED, window, now), '4% in reserve');
+    assert.equal(windowPace(UNTRANSLATED, {...window, percent: 0.54}, now), '4% ahead of pace');
+    assert.equal(windowPace(UNTRANSLATED, {...window, percent: 0.499}, now), 'On pace');
+    assert.equal(windowPace(UNTRANSLATED, {...window, percent: 0.501}, now), 'On pace');
+    assert.equal(windowPace(UNTRANSLATED, {...window, percent: 0}, now), '50% in reserve');
+    assert.equal(windowPace(UNTRANSLATED, {...window, percent: 1}, now), '50% ahead of pace');
+});
+
+test('quota pace uses a reported duration before the canonical window label', () => {
+    const now = Date.parse('2026-11-10T12:00:00Z');
+    const window = {canonicalWindow: 'five-hour', percent: 0.46, resetAt: now + 5400000, durationSeconds: 10800};
+    assert.equal(windowPace(UNTRANSLATED, window, now), '4% in reserve');
+    assert.equal(windowPace(UNTRANSLATED, {...window, durationSeconds: undefined, resetAt: now + 9000000}, now), '4% in reserve');
+    assert.equal(windowPace(UNTRANSLATED, {...window, canonicalWindow: 'other'}, now), '4% in reserve');
+    assert.equal(windowPace(UNTRANSLATED, {...window, percent: 0.1}, now + 2700000), '65% in reserve');
+});
+
+test('quota pace hides unknown, expired and future periods', () => {
+    const now = Date.parse('2026-11-10T12:00:00Z');
+    const window = {canonicalWindow: 'weekly', percent: 0.46, resetAt: now + 302400000};
+    for (const input of [null, {}, {...window, canonicalWindow: 'monthly'}, {...window, canonicalWindow: 'other'},
+        {...window, percent: null}, {...window, percent: NaN}, {...window, percent: -0.1}, {...window, percent: 1.1},
+        {...window, resetAt: null}, {...window, resetAt: Infinity}, {...window, resetAt: now},
+        {...window, resetAt: now - 1}, {...window, resetAt: now + 604800001},
+        {...window, durationSeconds: 0}, {...window, durationSeconds: -1}, {...window, durationSeconds: NaN},
+        {...window, durationSeconds: Infinity}, {...window, durationSeconds: 1e308}])
+        assert.equal(windowPace(UNTRANSLATED, input, now), null);
+    assert.equal(windowPace(UNTRANSLATED, window, NaN), null);
+});
+
+test('quota pace passes complete messages through the translator', () => {
+    const now = Date.parse('2026-11-10T12:00:00Z');
+    const tr = {...UNTRANSLATED, _: text => ({'%d%% in reserve': 'Reserve: %d%%', '%d%% ahead of pace': 'Ahead: %d%%', 'On pace': 'Even'}[text])};
+    const window = {canonicalWindow: 'weekly', percent: 0.46, resetAt: now + 302400000};
+    assert.equal(windowPace(tr, window, now), 'Reserve: 4%');
+    assert.equal(windowPace(tr, {...window, percent: 0.54}, now), 'Ahead: 4%');
+    assert.equal(windowPace(tr, {...window, percent: 0.5}, now), 'Even');
+});
 
 test('account accents use the GNOME accent palette and migrate the previous custom names', () => {
     assert.deepEqual(Object.keys(ACCENT_COLORS), ['blue', 'teal', 'green', 'yellow', 'orange', 'red', 'pink', 'purple', 'slate']);
