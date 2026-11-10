@@ -327,7 +327,7 @@ export class ProviderDetail extends PopupMenu.PopupMenuSection {
         const automatic = preference === 'automatic' ? selectWindow(snapshot, preference) : null;
         for (const [canonical, item] of this._windows) {
             const window = snapshot?.windows.find(candidate => candidate.canonicalWindow === canonical) ?? null;
-            item.visible = metadata.quotaWindows.includes(canonical) && (canonical !== 'weekly' || window !== null);
+            item.visible = metadata.quotaWindows.includes(canonical) && window !== null;
             if (!item.visible)
                 continue;
             const selected = preference === canonical || automatic?.canonicalWindow === canonical;

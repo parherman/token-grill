@@ -3,7 +3,7 @@
 ## Unreleased
 
 - Support GNOME Shell 51.
-- Hide unavailable weekly quotas in the popup.
+- Hide unavailable quotas in the popup.
 - Show the reset date and time below quotas in the popup, and identify reset times
   that have already passed.
 - Align reset-credit expiry text with quota reset text.
