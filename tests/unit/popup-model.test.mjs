@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {ACCENT_COLORS, accentStyleClass, normalizeAccent} from '../../build/tests/accent.mjs';
 import {UNTRANSLATED} from '../../build/tests/i18n.mjs';
-import {accountGroups, errorText, historySummary, refreshStatusText, shortAccountName, windowCaption} from '../../build/tests/popup-model.mjs';
+import {accountGroups, creditExpiryText, errorText, historySummary, refreshStatusText, shortAccountName, windowCaption} from '../../build/tests/popup-model.mjs';
 
 const provider = (id, kind, displayName, extra = {}) => ({id, kind, displayName, enabled: true, accent: 'blue', localHistoryEnabled: false, panelWindowPreference: 'automatic', ...extra});
 
@@ -81,6 +81,17 @@ test('window captions leave missing reset dates unavailable without formatting t
     };
     for (const resetAt of [null, undefined, NaN, Infinity, 1e20])
         assert.equal(windowCaption(tr, {resetAt}, dateTime), 'Reset time unknown');
+});
+
+test('reset credit expiry uses countdown followed by the date/time', () => {
+    const now = Date.UTC(2026, 9, 13, 10, 0);
+    const dateTime = timestamp => new Date(timestamp).toISOString();
+    const credit = {title: 'Weekly reset', expiresAt: now + (18 * 24 + 13) * 3600000};
+    assert.equal(creditExpiryText(tr, credit, dateTime, now), 'Weekly reset · Expires in 18d 13h (2026-10-31T23:00:00.000Z)');
+    assert.equal(creditExpiryText(tr, {...credit, title: null, expiresAt: now + 30000}, dateTime, now), 'Usage-limit reset · Expires in less than 1m (2026-10-13T10:00:30.000Z)');
+    assert.equal(creditExpiryText(tr, {...credit, expiresAt: now - 1000}, dateTime, now), 'Weekly reset · Expired (2026-10-13T09:59:59.000Z)');
+    assert.equal(creditExpiryText(tr, {...credit, expiresAt: null}, dateTime, now), 'Weekly reset · Expiry unavailable');
+    assert.equal(creditExpiryText(tr, {...credit, expiresAt: 1e20}, dateTime, now), 'Weekly reset · Expiry unavailable');
 });
 
 test('refresh status reads as a sentence and reflects each refresh phase', () => {
