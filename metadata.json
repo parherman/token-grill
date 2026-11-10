@@ -4,7 +4,8 @@
     "uuid": "tokengrill@sh02sahil.github.io",
     "url": "https://github.com/sh02sahil/token-grill",
     "shell-version": [
-        "50"
+        "50",
+        "51"
     ],
     "settings-schema": "org.gnome.shell.extensions.tokengrill",
     "version-name": "0.3.1"

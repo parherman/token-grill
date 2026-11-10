@@ -1,9 +1,10 @@
 # GNOME Shell Extension Practices (hard rules)
 
 Hard rules for writing and maintaining a GNOME Shell extension (GJS, ESM, GNOME 45+, current
-target GNOME 50) so that extensions.gnome.org (EGO) reviewers are never burdened by our code.
+targets GNOME 50 and 51) so that extensions.gnome.org (EGO) reviewers are never burdened by our code.
 Canonical sources were fetched on 2026-10-13. Every rule without a quoted source was re-checked
 against the raw sources and the GNOME 50 code on 2026-11-04.
+The GNOME 51 port guide and the supported targets were re-checked on 2026-11-10.
 
 ---
 
@@ -90,7 +91,7 @@ Require Maintainership"), the three jrahmatzadeh posts.
 | AI-7 | If the maintainer ever cannot vouch for the code, the extension stays personal/local and is not uploaded. That is the original intent of the notice in AI-5. | `[Best-practice]` `[Project]` |
 | AI-8 | Review replies on EGO MUST be written by the human maintainer. "Some submitters rely on AI to generate replies during the review process"; one pasted the LLM's instructions. Agents MUST NOT draft review replies for pasting. | `[EGO-reject]` |
 | AI-9 | Agents MUST NOT rewrite, squash or hide the history of the public repository that `url` points to. A reviewer who opens it should find the code that produced the zip and how it got there. | `[Project]` |
-| AI-10 | Agents MUST write for exactly one GNOME Shell version (Section 14). Multi-version hedges (`typeof X === 'function'`, `?.()` on guaranteed APIs, comments like "works on 48–50") are the primary AI signal named in the Best Practices page. | `[Best-practice]` |
+| AI-10 | Target GNOME Shell 50 and 51 using their shared APIs (Section 14). Do not add speculative version checks (`typeof X === 'function'`, `?.()` on guaranteed APIs) or support claims for other versions. | `[Project]` |
 
 ---
 
@@ -135,7 +136,7 @@ Sources: https://gjs.guide/extensions/overview/anatomy.html, Review Guidelines
 | ID   | Rule | Origin |
 |------|------|--------|
 | M-1  | `metadata.json` MUST exist, MUST be valid UTF-8 JSON whose top level is an object, and MUST contain only the keys in the table above. | `[EGO-reject]` `[Shexli EGO-M-001/002]` |
-| M-2  | For a GNOME 50 target today, `shell-version` is `["50"]`. Add a newer major only after it is a released stable (or the single development release) that was actually tested, and after Shexli accepts it. | `[EGO-reject]` `[Shexli EGO-M-004]` |
+| M-2  | The supported targets use `shell-version` `["50", "51"]`. List only tested versions. Shexli 0.2.1 still rejects 51, so this port remains a draft until the review check passes (T-2). | `[Project]` `[Shexli EGO-M-004]` |
 
 Reference example (adapted from the Review Guidelines):
 
@@ -503,7 +504,7 @@ linter"), GNOME Shell `docs/js-coding-style.md`.
 |------|------|--------|
 | Q-1  | No unnecessary try/catch. "Do not wrap functions in try-catch blocks if they never throw errors during normal execution. Standard methods like destroy(), connect(), disconnect(), abort(), and GLib.Source.remove() do not throw unhandled exceptions." Also `cancellable.cancel()`, `clear()`, `close()` on already-closed streams. Empty or comment-only `catch` blocks are forbidden. Whole-function "render safely" wrappers are forbidden. | `[Best-practice]` |
 | Q-2  | No unnecessary checks. "Do not use optional chaining (?.()) or function type checks (=== 'function') for guaranteed methods or built-in APIs." `?.` is for values that are genuinely nullable by design; `this._indicator?.destroy()` in `disable()` is the one idiom the official docs use. | `[Best-practice]` |
-| Q-3  | No multi-version shims. "Generate clean code for a single targeted GNOME Shell version. If multi version compatibility is truly necessary, refer to the official EGO Port Guide." Comments such as "reliable across GNOME 48–50" are a hedge and MUST NOT appear in a single-version extension. | `[Best-practice]` |
+| Q-3  | Use APIs shared by GNOME Shell 50 and 51. Refer to both port guides before introducing a version-specific path; do not add speculative compatibility shims or claims for untested versions. | `[Project]` |
 | Q-4  | Comments: "Write self-explanatory code with clear variable and function names to make redundant comments unnecessary. Comments that explain basic JavaScript syntax, describe trivial operations, or translate code line-by-line into natural language are not allowed." Comments explain *why*, never *what*. | `[Best-practice]` |
 | Q-5  | Line length MUST be at most 200 characters in every shipped `.js` file ("avoids unnecessary horizontal scrolling in the EGO review UI"). One statement per line; no packed `a(); b(); c();` lines. | `[Best-practice]` |
 | Q-6  | No duplication. "Avoid copying and pasting identical code blocks. Repetitive logic should be extracted into modular helper functions." | `[Best-practice]` |
@@ -896,8 +897,8 @@ Sources: https://gjs.guide/extensions/upgrading/ (45–51), https://release.gnom
 
 | ID  | Rule | Origin |
 |-----|------|--------|
-| V-1 | Target exactly one GNOME Shell version (currently 50) and write code for that version only (Q-3). `shell-version` lists only what was tested (M-2). | `[Best-practice]` |
-| V-2 | Do not start using anything a newer port guide removes or deprecates (UI-7, L-3). Write 50 code that is already 51-clean. | `[Port-guide 51]` |
+| V-1 | Target GNOME Shell 50 and 51 using their shared APIs (Q-3). `shell-version` lists only what was tested (M-2). | `[Best-practice]` |
+| V-2 | Do not use anything the GNOME 51 port guide removes or deprecates (UI-7, L-3). | `[Port-guide 51]` |
 | V-3 | When bumping the target, read the port guide for every intermediate version and apply each change; then re-run Shexli and the nested-shell test. | `[Convention]` |
 
 | Version | Change | Action |
@@ -970,7 +971,7 @@ uvx --python 3.12 --from shexli==0.2.1 --with tree-sitter==0.25.2 shexli --forma
 | Always exits 0, even with findings | CI MUST parse the summary (`finding_count`, `severity_counts`, `status`) or the JSON; the exit code means nothing. |
 | Crashes on a relative directory path (`path.relative_to` ValueError) | Always pass an absolute directory path; zip paths work either way. |
 | Needs `tree-sitter==0.25.x` | tree-sitter 0.26 breaks it; pin 0.25.2. |
-| Any `shell-version` major > 50 is an "implausible future release" (hard-coded) | EGO-M-004 error. Do not list 51 until Shexli is updated. |
+| Any `shell-version` major > 50 is an "implausible future release" (hard-coded) | EGO-M-004 error. The GNOME 51 port cannot be released until Shexli is updated (T-2). |
 | Only two CLI flags: `--format {json,text}` and the path | No rule selection, no baseline, no suppression. Baselines and `shexli-ci:` comments belong to the third-party `3v1n0/shexli-ci` wrapper, not Shexli. |
 | Limits | 5000 files, 10 MiB per file, 50 MiB total, zip ratio ≤ 1000, rejects symlinks and `..` paths. |
 
@@ -1101,7 +1102,7 @@ gnome-extensions upload --accept-tos --user <user> --password-file <file> <zip>
 Metadata and package
 
 - [ ] `metadata.json`: only documented keys; `uuid` unchanged and not under `gnome.org`;
-      `shell-version` lists only tested released majors (`["50"]`); no `version`;
+      `shell-version` lists only tested released majors (`["50", "51"]`); no `version`;
       `session-modes` and `donations` absent unless truly used; description accurate,
       declares clipboard/hosts if applicable (M-1, M-2, table 3.2).
 - [ ] Zip root has `extension.js`, `prefs.js`, `metadata.json`; everything else is read at

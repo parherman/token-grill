@@ -1,8 +1,8 @@
 # Token Grill: notes for coding agents
 
-Token Grill is a GNOME Shell 50 extension in TypeScript. It shows the usage
+Token Grill is a GNOME Shell extension in TypeScript. It shows the usage
 limits of Codex, Claude, Kiro, and Antigravity accounts in the top bar. It
-operates only with GNOME Shell 50. The target is extensions.gnome.org.
+operates with GNOME Shell 50 and 51. The target is extensions.gnome.org.
 
 [PRACTICES.md](PRACTICES.md) is the set of rules. Each rule in it is a hard
 rule. Before you change a file, read the sections that apply to that file.
