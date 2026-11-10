@@ -65,9 +65,19 @@ function kiroHomes(): ProviderInstance[] {
     return hasCredentials(provider) ? [provider] : [];
 }
 
+function cursorHomes(): ProviderInstance[] {
+    const homes = [
+        {home: defaultHome('cursor'), displayName: 'Cursor IDE'},
+        {home: GLib.build_filenamev([GLib.get_user_config_dir(), 'cursor']), displayName: 'Cursor Agent'},
+    ];
+    return homes
+        .map(({home, displayName}) => ({...newProvider('cursor', home), displayName}))
+        .filter(hasCredentials);
+}
+
 export function discoverAccounts(configured: ProviderInstance[]): Discovery {
     const known = new Set(configured.map(provider => expandPath(provider.accountHome)));
-    const candidates = [...prefixedHomes(), ...kiroHomes(), ...antigravityHomes()];
+    const candidates = [...prefixedHomes(), ...kiroHomes(), ...antigravityHomes(), ...cursorHomes()];
     const found = [];
     for (const candidate of candidates) {
         const home = expandPath(candidate.accountHome);

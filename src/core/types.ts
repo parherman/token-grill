@@ -1,4 +1,4 @@
-export type ProviderKind = 'codex' | 'claude' | 'kiro' | 'antigravity';
+export type ProviderKind = 'codex' | 'claude' | 'kiro' | 'antigravity' | 'cursor';
 export type AccentColor = 'blue' | 'teal' | 'green' | 'yellow' | 'orange' | 'red' | 'pink' | 'purple' | 'slate';
 export type QuotaWindowPreference = 'automatic' | 'five-hour' | 'weekly' | 'monthly';
 export type PanelPercentageMode = 'remaining' | 'used';

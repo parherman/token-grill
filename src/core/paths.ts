@@ -8,6 +8,7 @@ const DEFAULT_HOMES: Record<ProviderKind, string[]> = {
     claude: ['.claude'],
     kiro: [],
     antigravity: ['.gemini', 'antigravity-cli'],
+    cursor: [],
 };
 
 // Antigravity tools have written their OAuth credentials under each of these names.
@@ -18,6 +19,7 @@ const AUTH_FILES: Record<ProviderKind, string> = {
     claude: '.credentials.json',
     kiro: 'data.sqlite3',
     antigravity: 'acp_token.json',
+    cursor: 'User/globalStorage/state.vscdb',
 };
 
 const HISTORY_DIRECTORIES: Record<ProviderKind, string[]> = {
@@ -25,6 +27,7 @@ const HISTORY_DIRECTORIES: Record<ProviderKind, string[]> = {
     claude: ['projects'],
     kiro: [],
     antigravity: [],
+    cursor: [],
 };
 
 export function expandPath(value: string): string {
@@ -48,6 +51,8 @@ export function displayPath(value: string): string {
 }
 
 export function defaultHome(kind: ProviderKind): string {
+    if (kind === 'cursor')
+        return GLib.build_filenamev([GLib.get_user_config_dir(), 'Cursor']);
     if (kind === 'kiro')
         return GLib.build_filenamev([GLib.get_user_data_dir(), 'kiro-cli']);
     return GLib.build_filenamev([GLib.get_home_dir(), ...DEFAULT_HOMES[kind]]);
@@ -67,6 +72,8 @@ export function providerPaths(instance: ProviderInstance): ProviderPaths {
 
 // The files tried for an account's credentials, in order of preference.
 export function authFileCandidates(instance: ProviderInstance): string[] {
+    if (instance.kind === 'cursor' && !instance.authFileOverride)
+        return [providerPaths(instance).authFile, GLib.build_filenamev([expandPath(instance.accountHome), 'auth.json'])];
     if (instance.kind !== 'antigravity' || instance.authFileOverride)
         return [providerPaths(instance).authFile];
     const home = expandPath(instance.accountHome);

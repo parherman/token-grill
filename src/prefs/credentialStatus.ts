@@ -8,6 +8,7 @@ import type {ProviderInstance, ProviderKind} from '../core/types.js';
 import {antigravityCredentialStatus} from '../providers/antigravity/auth.js';
 import {loadClaudeAccessToken} from '../providers/claude/auth.js';
 import {loadCodexAccessToken} from '../providers/codex/auth.js';
+import {CursorAuthStore} from '../providers/cursor/auth.js';
 import {kiroCredentialStatus} from '../providers/kiro/auth.js';
 
 export type CredentialState =
@@ -30,6 +31,8 @@ async function authFileState(load: Promise<unknown>): Promise<CredentialState> {
             throw error;
         if (error.code === 'auth-expired')
             return 'expired';
+        if (error.code === 'dependency')
+            return 'gda-missing';
         if (error.code === 'auth-invalid' || error.code === 'permission')
             return 'unreadable';
         return 'login-required';
@@ -53,6 +56,7 @@ const CREDENTIAL_CHECKS: Record<ProviderKind, (provider: ProviderInstance, cance
     claude: (provider, cancellable) => authFileState(loadClaudeAccessToken(provider, cancellable)),
     kiro: kiroState,
     antigravity: antigravityState,
+    cursor: (provider, cancellable) => authFileState(new CursorAuthStore().load(provider, cancellable)),
 };
 
 // Rejects only when cancelled or on an unexpected error.

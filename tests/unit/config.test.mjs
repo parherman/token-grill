@@ -26,7 +26,7 @@ test('independent Codex homes remain independent provider instances', () => {
 });
 
 test('invalid kinds, schema versions and homes are rejected', () => {
-    assert.deepEqual(normalizeProvider(entry({kind: 'cursor'})), []);
+    assert.deepEqual(normalizeProvider(entry({kind: 'unknown'})), []);
     assert.deepEqual(normalizeProvider(entry({schemaVersion: 3})), []);
     assert.deepEqual(normalizeProvider(entry({accountHome: 'relative/home'})), []);
 });
@@ -55,7 +55,7 @@ test('legacy entries are migrated once and the result is stable', () => {
 });
 
 test('a legacy value with an unreadable entry is kept for recovery', () => {
-    const stored = [entry({schemaVersion: 1}), entry({schemaVersion: 1, id: 'b', kind: 'cursor'})];
+    const stored = [entry({schemaVersion: 1}), entry({schemaVersion: 1, id: 'b', kind: 'unknown'})];
     const settings = fakeSettings(stored, 1);
     migrateProviderSettings(settings);
     assert.deepEqual(JSON.parse(settings.values['provider-instances-json']), stored);

@@ -166,7 +166,8 @@ export class ProvidersPage extends Adw.PreferencesPage {
             : new Adw.AlertDialog({
                 heading: _('No New Accounts Found'),
                 body: _('Token Grill looked for Codex and Claude homes named ~/.codex* and ~/.claude*, ' +
-                    'the Kiro CLI data store, and Antigravity homes in ~/.gemini, ~/.antigravity, and ~/.config/Antigravity.'),
+                    'the Kiro CLI data store, Antigravity homes in ~/.gemini, ~/.antigravity, and ~/.config/Antigravity, ' +
+                    'and Cursor IDE and Agent credentials in the system configuration directory.'),
             });
         alert.add_response('close', _('Close'));
         alert.present(this._window);

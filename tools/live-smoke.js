@@ -1,7 +1,7 @@
 // Collects one account against the real service with the built extension
 // modules, outside GNOME Shell. Run `npm run build` first.
 //
-//     gjs -m tools/live-smoke.js <codex|claude|kiro|antigravity> [account-home] [auth-file]
+//     gjs -m tools/live-smoke.js <codex|claude|kiro|antigravity|cursor> [account-home] [auth-file]
 //
 // Prints the outcome and the usage windows only: no tokens and no e-mail address.
 import GLib from 'gi://GLib';
@@ -26,7 +26,7 @@ const [{newProvider}, {UNTRANSLATED}, {defaultHome, displayPath, providerPaths},
 
 const collectors = createCollectors();
 if (!(kind in collectors)) {
-    console.error('Usage: gjs -m tools/live-smoke.js <codex|claude|kiro|antigravity> [account-home] [auth-file]');
+    console.error('Usage: gjs -m tools/live-smoke.js <codex|claude|kiro|antigravity|cursor> [account-home] [auth-file]');
     throw new Error(`Unknown kind: ${kind}`);
 }
 const instance = {...newProvider(kind, home ?? defaultHome(kind)), authFileOverride: authFile ?? null};

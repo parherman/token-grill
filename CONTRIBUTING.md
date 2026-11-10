@@ -26,7 +26,7 @@ You must also have these items:
 - The Mutter devkit (`/usr/libexec/mutter-devkit`) for the nested shell. On
   Debian or Ubuntu, the package is `mutter-dev-bin`.
 - [`uv`](https://docs.astral.sh/uv/) for the GNOME Extensions review scan.
-- The Gda 5.0 SQLite library (`gir1.2-gda-5.0`) for Kiro accounts.
+- The Gda 5.0 SQLite library (`gir1.2-gda-5.0`) for Kiro and Cursor IDE accounts.
 - The libsecret 1 library (`gir1.2-secret-1`) for the keyring of the
   Antigravity CLI.
 
@@ -164,15 +164,17 @@ loads only after you log out and log in again.
 These scripts use `gjs` to run the built modules of the extension outside
 GNOME Shell. The scripts only read data.
 
-This check does not use the network or real data:
+These checks do not use the network or real data:
 
+- `npm run test:cursor` checks synthetic Cursor IDE and Agent credentials, SQLite WAL
+  updates, profile isolation, and collection failures.
 - `npm run test:kiro-gda` makes a test `kiro-cli` database in a temporary
   directory. It reads the database through the Gda code of Token Grill. Then
   it makes sure that a read-only connection refuses a write.
 
 This check uses your real credentials:
 
-- `npm run test:live -- <codex|claude|kiro|antigravity> [account-home] [auth-file]`
+- `npm run test:live -- <codex|claude|kiro|antigravity|cursor> [account-home] [auth-file]`
   gets the usage of one account from the real service, with your real
   credentials. It shows only the result and the usage limits. It does not show
   tokens or e-mail addresses. For Kiro, the check fails if the `kiro-cli`

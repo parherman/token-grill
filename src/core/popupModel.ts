@@ -200,6 +200,7 @@ function withSignInHint(tr: Translator, kind: ProviderKind, message: string): st
         claude: _('%s Run claude and sign in.'),
         kiro: _('%s Run kiro-cli login.'),
         antigravity: _('%s Sign in again with Antigravity or agy.'),
+        cursor: _('%s Open Cursor and sign in again, or run agent login.'),
     };
     return formatText(templates[kind], message);
 }

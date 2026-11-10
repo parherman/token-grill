@@ -6,7 +6,7 @@ import Gtk from 'gi://Gtk';
 import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import {newProvider, QUOTA_WINDOW_PREFERENCES, readProviders} from '../core/config.js';
 import {formatText} from '../core/i18n.js';
-import {defaultHome, displayPath, expandPath, providerPaths} from '../core/paths.js';
+import {authFileCandidates, defaultHome, displayPath, expandPath, providerPaths} from '../core/paths.js';
 import {PROVIDER_KINDS, providerMetadata} from '../core/providerMetadata.js';
 import {ACCENTS, type AccentColor, type ProviderInstance, type ProviderKind} from '../core/types.js';
 import {
@@ -319,7 +319,8 @@ export class ProviderEditorDialog extends Adw.Dialog {
             this._resolved.subtitle = _('Enter valid paths to see the resolved locations');
         } else {
             const paths = providerPaths(draft);
-            this._resolved.subtitle = [paths.authFile, ...paths.historyDirectories].map(displayPath).join(' · ');
+            const credentials = draft.kind === 'cursor' ? authFileCandidates(draft) : [paths.authFile];
+            this._resolved.subtitle = [...credentials, ...paths.historyDirectories].map(displayPath).join(' · ');
         }
         return result;
     }

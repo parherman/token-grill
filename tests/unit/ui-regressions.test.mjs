@@ -92,7 +92,7 @@ test('refresh progress uses the native shell spinner and UI uses centralized pac
     assert.doesNotMatch(dashboard, /rotation-angle-z/);
     assert.match(widgets, /Gio\.FileIcon\.new\(file\)/);
     assert.match(widgets, /providerIconFile\(kind\)/);
-    for (const kind of ['codex', 'claude', 'kiro', 'antigravity'])
+    for (const kind of ['codex', 'claude', 'kiro', 'antigravity', 'cursor'])
         assert.match(metadata, new RegExp(`iconFile: '${kind}-symbolic\\.svg'`));
     assert.match(chip, /Gio\.icon_new_for_string\(`\$\{extensionPath\}\/icons\/providers\/\$\{providerIconFile\(kind\)\}`\)/);
 });
@@ -122,7 +122,7 @@ test('provider HTTP requests are bounded and cannot follow redirects', async () 
     assert.doesNotMatch(source, /'User-Agent'/);
     assert.match(source, /const status = message\.status_code;/, 'GJS throws for status codes missing from Soup.Status, such as 429');
     assert.doesNotMatch(source, /get_status\(\)\s*;/);
-    assert.match(source, /export const USER_AGENT = 'TokenGrill \(\+https:\/\/github\.com\/sh02sahil\/token-grill; [^']*Antigravity\)'/);
+    assert.match(source, /export const USER_AGENT = 'TokenGrill \(\+https:\/\/github\.com\/sh02sahil\/token-grill; [^']*Antigravity[^']*\)'/);
 });
 
 test('persisted state uses private permissions and bounded regular files', async () => {
