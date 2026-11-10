@@ -155,15 +155,15 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
     }
 
     private _title: string;
-    private _onSelect: () => void;
+    private _onSelect: (() => void) | null;
     private _warning: St.Icon;
     private _value: St.Label;
     private _meter: BarLevel.BarLevel;
     private _caption: St.Label;
     private _pace: St.Label;
 
-    constructor(title: string, onSelect: () => void) {
-        super({style_class: 'tokengrill-window-item'});
+    constructor(title: string, onSelect: (() => void) | null) {
+        super({style_class: 'tokengrill-window-item', activate: onSelect !== null, can_focus: onSelect !== null, hover: onSelect !== null});
         this._title = title;
         this._onSelect = onSelect;
         this.setOrnament(PopupMenu.Ornament.NO_DOT);
@@ -195,7 +195,7 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
     }
 
     override activate(_event: Clutter.Event): void {
-        this._onSelect();
+        this._onSelect?.();
     }
 
     update(window: UsageWindow | null, mode: PanelPercentageMode, selected: boolean, state: ProviderSnapshot['state'] | undefined): void {
@@ -268,6 +268,7 @@ export class ProviderDetail extends PopupMenu.PopupMenuSection {
     private _identity: IdentityItem;
     private _error: InfoItem;
     private _windows = new Map<QuotaWindow, WindowItem>();
+    private _current: WindowItem;
     private _credits: PopupMenu.PopupSubMenuMenuItem;
     private _creditsNone: InfoItem;
     private _history: InfoItem;
@@ -284,10 +285,11 @@ export class ProviderDetail extends PopupMenu.PopupMenuSection {
             const item = new WindowItem(windowName(window), () => this._withInstance(instance => this._actions.selectWindow(instance, window)));
             this._windows.set(window, item);
         }
+        this._current = new WindowItem(_('Current period'), null);
         this._credits = new PopupMenu.PopupSubMenuMenuItem(_('Reset Credits'), false);
         this._creditsNone = new InfoItem();
         this._history = new InfoItem();
-        this._items = [this._identity, this._error, ...this._windows.values(), this._credits, this._creditsNone, this._history];
+        this._items = [this._identity, this._error, ...this._windows.values(), this._current, this._credits, this._creditsNone, this._history];
         for (const item of this._items)
             this.addMenuItem(item);
     }
@@ -327,12 +329,15 @@ export class ProviderDetail extends PopupMenu.PopupMenuSection {
         const automatic = preference === 'automatic' ? selectWindow(snapshot, preference) : null;
         for (const [canonical, item] of this._windows) {
             const window = snapshot?.windows.find(candidate => candidate.canonicalWindow === canonical) ?? null;
-            item.visible = metadata.quotaWindows.includes(canonical) && (canonical !== 'weekly' || window !== null);
+            item.visible = metadata.quotaWindows.includes(canonical) && ((canonical !== 'weekly' && instance.kind !== 'cursor') || window !== null);
             if (!item.visible)
                 continue;
             const selected = preference === canonical || automatic?.canonicalWindow === canonical;
             item.update(window, mode, selected, snapshot?.state);
         }
+        const current = instance.kind === 'cursor' ? snapshot?.windows.find(window => window.canonicalWindow === 'other') ?? null : null;
+        this._current.visible = current !== null;
+        this._current.update(current, mode, current !== null, snapshot?.state);
 
         this._updateCredits(snapshot?.resetCredits ?? null);
         this._history.setText(historySummary(TRANSLATOR, historyMetrics(instance, snapshot, runtime)));
