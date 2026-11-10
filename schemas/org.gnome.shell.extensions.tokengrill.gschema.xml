@@ -4,7 +4,7 @@
         <key name="provider-instances-json" type="s">
             <default>'[]'</default>
             <summary>Configured accounts</summary>
-            <description>Versioned JSON definitions of the Codex, Claude, Kiro, and Antigravity accounts Token Grill monitors.</description>
+            <description>Versioned JSON definitions of the accounts Token Grill monitors.</description>
         </key>
         <key name="configuration-version" type="u">
             <default>2</default>

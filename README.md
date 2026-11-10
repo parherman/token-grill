@@ -12,7 +12,7 @@ times.
 
 These are the functions of the top bar and the popup:
 
-- Token Grill monitors Codex, Claude, Kiro, and Antigravity accounts. You can
+- Token Grill monitors Codex, Claude, Kiro, Antigravity, and Cursor accounts. You can
   add more than one account for each service.
 - The top bar shows the active account as text, as a ring, or as a bar.
 - The popup shows the limits of each account and their reset times in your
@@ -60,7 +60,7 @@ To install a release archive before the approval, do these steps:
 
 ## Add an account
 
-1. Sign in to the service with the CLI of that service. Token Grill does not
+1. Sign in to the service with its app or CLI. Token Grill does not
    sign in for you.
 2. Open the preferences of Token Grill.
 3. Go to the **Providers** page.
@@ -90,7 +90,7 @@ accounts continue to operate.
 
 ## Privacy and network access
 
-Token Grill reads the credentials that the CLI of each service stored on this
+Token Grill reads the credentials that the apps and CLIs stored on this
 computer. It sends these credentials only to that service. Token Grill
 connects only to these hosts:
 
@@ -159,6 +159,36 @@ Token Grill does not unlock a locked keyring.
 If a Kiro or Antigravity access token is expired, Token Grill gets a new token.
 It keeps the new token only in memory. It does not write the token to the files
 or the keyring of the service.
+
+### Cursor accounts
+
+Cursor IDE credentials are read from `<home>/User/globalStorage/state.vscdb`.
+The default home is `Cursor` in the system configuration directory
+(`$XDG_CONFIG_HOME`, normally `~/.config`). Cursor Agent credentials are read
+from `<home>/auth.json`; its default directory is lowercase `cursor` in the
+same configuration directory. **Discover…** names them **Cursor IDE** and
+**Cursor Agent**.
+
+Set **Account Home** to an independent IDE user-data directory or Agent
+credential directory. Each home is a separate account. **Auth File Override**
+selects a `.vscdb` or `.json` credential file directly. An IDE database takes
+precedence when both stores exist in one home. JWT access tokens use their
+account identity; opaque `curs` tokens require a valid `authId` in the IDE
+cached scoped profile. Requests use Bearer authentication. The JWT path has
+been checked live; opaque-token authentication still needs a live check.
+Token Grill does not switch accounts after a sign-in failure. Open Cursor and
+sign in again, or run `agent login`, when a session expires.
+
+Cursor shows the primary allowance and reset time. The current-period usage
+endpoint supplies subscription usage; Enterprise accounts can use the personal
+current overall budget from the usage summary when the current-period response
+reports no billing period. Weekly and monthly labels follow the
+reported period boundaries; other periods show **Current period**. A missing
+usage allowance is reported as unavailable. Confirmed unlimited or disabled
+allowances clear cached quotas; malformed responses retain the error state.
+
+Cursor's read-only usage API is undocumented and can change. Cursor IDE accounts
+use Gda 5.0 with SQLite, including database changes held in the WAL file.
 
 ### Files of Token Grill
 

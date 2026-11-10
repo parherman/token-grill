@@ -8,6 +8,9 @@
   that have already passed.
 - Align reset-credit expiry text with quota reset text.
 - Show usage pace below quotas in the popup.
+- Monitor Cursor IDE and Agent accounts, including opaque IDE credentials with a
+  cached profile identity. Clear obsolete quotas when an allowance becomes unlimited
+  or disabled.
 
 ## 0.3.1
 
