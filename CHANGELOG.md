@@ -7,6 +7,7 @@
 - Show the reset date and time below quotas in the popup, and identify reset times
   that have already passed.
 - Align reset-credit expiry text with quota reset text.
+- Show usage pace below quotas in the popup.
 
 ## 0.3.1
 

@@ -17,6 +17,11 @@ These are the functions of the top bar and the popup:
 - The top bar shows the active account as text, as a ring, or as a bar.
 - The popup shows the limits of each account and their reset times in your
   local time zone.
+- Quotas with a known period show usage pace below the reset time. Halfway
+  through a period, 46% used shows **4% in reserve**; 54% used shows
+  **4% ahead of pace**. This compares usage with an even pace through the period.
+  Pace is shown for current readings with a reported duration, or a five-hour
+  or weekly period.
 - You can select a different account in the popup.
 - If a refresh gets an error, the popup keeps the last good values and shows
   the error.

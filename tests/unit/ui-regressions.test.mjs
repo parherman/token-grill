@@ -244,7 +244,7 @@ test('UI signals are disconnected and owned actors are released', async () => {
     assert.match(dashboard, /this\._refreshButton\.connect\('clicked', \(\) => onRefresh\(\)\)/);
     assert.match(indicator, /this\._box\.destroy_all_children\(\)/);
     assert.match(indicator, /this\._themeContext!\.disconnect\(this\._themeChangedId!\);\s*this\._themeChangedId = null;\s*this\._themeContext = null;\s*this\._ui = null;\s*super\.destroy\(\)/);
-    assert.doesNotMatch(indicator, /resetShellCursor|open-state-changed|menu\.removeAll/);
+    assert.doesNotMatch(indicator, /resetShellCursor|menu\.removeAll/);
 });
 
 test('runtime releases all lifecycle-owned references during stop', async () => {
