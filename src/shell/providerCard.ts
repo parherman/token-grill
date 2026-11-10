@@ -319,10 +319,10 @@ export class ProviderDetail extends PopupMenu.PopupMenuSection {
         const preference = instance.panelWindowPreference;
         const automatic = preference === 'automatic' ? selectWindow(snapshot, preference) : null;
         for (const [canonical, item] of this._windows) {
-            item.visible = metadata.quotaWindows.includes(canonical);
+            const window = snapshot?.windows.find(candidate => candidate.canonicalWindow === canonical) ?? null;
+            item.visible = metadata.quotaWindows.includes(canonical) && window !== null;
             if (!item.visible)
                 continue;
-            const window = snapshot?.windows.find(candidate => candidate.canonicalWindow === canonical) ?? null;
             const selected = preference === canonical || automatic?.canonicalWindow === canonical;
             item.update(window, mode, selected);
         }
