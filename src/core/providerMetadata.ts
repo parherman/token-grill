@@ -42,6 +42,14 @@ export const PROVIDER_METADATA: Record<ProviderKind, ProviderMetadata> = {
         defaultQuotaWindow: 'automatic',
         localHistorySupported: false,
     },
+    cursor: {
+        label: 'Cursor',
+        defaultAccent: 'blue',
+        iconFile: 'cursor-symbolic.svg',
+        quotaWindows: ['weekly', 'monthly'],
+        defaultQuotaWindow: 'automatic',
+        localHistorySupported: false,
+    },
 };
 
 export const PROVIDER_KINDS = Object.keys(PROVIDER_METADATA) as ProviderKind[];

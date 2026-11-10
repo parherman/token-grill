@@ -1,7 +1,7 @@
 # Token Grill: notes for coding agents
 
 Token Grill is a GNOME Shell extension in TypeScript. It shows the usage
-limits of Codex, Claude, Kiro, and Antigravity accounts in the top bar. It
+limits of Codex, Claude, Kiro, Antigravity, and Cursor accounts in the top bar. It
 operates with GNOME Shell 50 and 51. The target is extensions.gnome.org.
 
 [PRACTICES.md](PRACTICES.md) is the set of rules. Each rule in it is a hard
@@ -27,7 +27,7 @@ modules of the other process.
   the next refresh.
 
 - `src/providers/`: one collector for each service (`codex/`, `claude/`,
-  `kiro/`, `antigravity/`). `registry.ts` creates the collectors.
+  `kiro/`, `antigravity/`, `cursor/`). `registry.ts` creates the collectors.
 
 More modules of the Shell process:
 
@@ -77,8 +77,9 @@ npm test               # bundles pure modules into build/tests/, then node --tes
 npm run build          # per-file tsc emit into dist/<uuid>/, then GNOME ESLint over dist/
 npm run release:check  # metadata, package tree, development traces, line length
 npm run review:check   # pack, then Shexli on dist/ and on the zip; must report zero findings
+npm run test:cursor    # synthetic Cursor profiles and collector checks (no network)
 npm run test:kiro-gda  # synthetic kiro-cli database through the real Gda code (no network)
-npm run test:live -- <codex|claude|kiro|antigravity> [home] [auth-file]
+npm run test:live -- <codex|claude|kiro|antigravity|cursor> [home] [auth-file]
                        # one real collection with the user's credentials; prints no secrets
 npm run install:local  # replaces the user's installed copy: only after nested-shell checks
 npm run dev:shell      # nested GNOME Shell with the installed copy
@@ -199,11 +200,11 @@ Other rules:
 These exceptions are intentional. Do not change them if the reason stays the
 same.
 
-- **Token Grill reads the Kiro database synchronously through libgda 5.**
+- **Token Grill reads the Kiro and Cursor databases synchronously through libgda 5.**
   libgda 5 has no asynchronous API. Token Grill first examines the size and
   the modification time of the database and its `-wal` file asynchronously.
   It reads the database only after a change (`kiro/auth.ts`,
-  `kiro/collector.ts`).
+  `kiro/collector.ts`, `cursor/auth.ts`, and the shared `providers/sqlite.ts`).
 
 - **`jsonl.ts` calls `input.seek()` synchronously.** No asynchronous seek
   exists, and lseek does no disk I/O.

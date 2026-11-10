@@ -1,6 +1,6 @@
 {
     "name": "Token Grill",
-    "description": "Token Grill shows the usage limits of your Codex, Claude, Kiro, and Antigravity accounts in the GNOME top bar. It monitors more than one account at the same time.\n\nToken Grill reads the credentials that each service stored on this computer. It sends these credentials only to that service. It connects only to these hosts:\n* chatgpt.com (Codex)\n* api.anthropic.com (Claude)\n* The Amazon CodeWhisperer, Amazon Q, and AWS OIDC hosts of the region of your account (Kiro)\n* cloudcode-pa.googleapis.com and oauth2.googleapis.com (Antigravity)\n\nToken Grill is an independent project. The owners of these services do not endorse or sponsor Token Grill.",
+    "description": "Token Grill shows the usage limits of your Codex, Claude, Kiro, Antigravity, and Cursor accounts in the GNOME top bar. It monitors more than one account at the same time.\n\nToken Grill reads the credentials that each service stored on this computer. It sends these credentials only to that service. It connects only to these hosts:\n* chatgpt.com (Codex)\n* api.anthropic.com (Claude)\n* The Amazon CodeWhisperer, Amazon Q, and AWS OIDC hosts of the region of your account (Kiro)\n* cloudcode-pa.googleapis.com and oauth2.googleapis.com (Antigravity)\n* api2.cursor.sh (Cursor)\n\nToken Grill is an independent project. The owners of these services do not endorse or sponsor Token Grill.",
     "uuid": "tokengrill@sh02sahil.github.io",
     "url": "https://github.com/sh02sahil/token-grill",
     "shell-version": [

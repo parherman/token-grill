@@ -76,12 +76,12 @@ accounts.
 
 ## Optional system libraries
 
-Two services must have a GObject introspection library from your Linux
+These services use a GObject introspection library from your Linux
 distribution:
 
 | Service                           | Library                          | Debian or Ubuntu package |
 | --------------------------------- | -------------------------------- | ------------------------ |
-| Kiro                              | Gda 5.0 with the SQLite provider | `gir1.2-gda-5.0`         |
+| Kiro and Cursor IDE                | Gda 5.0 with the SQLite provider | `gir1.2-gda-5.0`         |
 | Antigravity CLI (keyring sign-in) | libsecret 1                      | `gir1.2-secret-1`        |
 
 Token Grill loads a library with a dynamic `import()` only when an account
@@ -102,6 +102,7 @@ connects only to these hosts:
 | Kiro        | `oidc.<region>.amazonaws.com`                                                                                 | A new token when the sign-in is expired |
 | Antigravity | `cloudcode-pa.googleapis.com`                                                                                 | Plan and usage limits                   |
 | Antigravity | `oauth2.googleapis.com`                                                                                       | A new token when the sign-in is expired |
+| Cursor      | `api2.cursor.sh`                                                                                              | Usage limits                            |
 
 Each request obeys these limits:
 
@@ -113,7 +114,7 @@ Each request obeys these limits:
 Each request uses this User-Agent:
 
 ```text
-TokenGrill (+https://github.com/sh02sahil/token-grill; usage monitor for Codex, Claude, Kiro and Antigravity)
+TokenGrill (+https://github.com/sh02sahil/token-grill; usage monitor for Codex, Claude, Kiro, Antigravity and Cursor)
 ```
 
 The Antigravity quota service gives data only when the User-Agent contains
