@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Support GNOME Shell 51.
+
 ## 0.3.1
 
 Bug fixes:

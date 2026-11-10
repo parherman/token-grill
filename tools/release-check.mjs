@@ -15,8 +15,8 @@ if (metadata.uuid !== expectedUuid)
     errors.push(`Public UUID must be ${expectedUuid}.`);
 if (metadata.url !== expectedUrl)
     errors.push(`Project URL must be ${expectedUrl}.`);
-if (JSON.stringify(metadata['shell-version']) !== JSON.stringify(['50']))
-    errors.push('The release must target GNOME Shell 50 only.');
+if (JSON.stringify(metadata['shell-version']) !== JSON.stringify(['50', '51']))
+    errors.push('The release must target GNOME Shell 50 and 51.');
 if (metadata['settings-schema'] !== 'org.gnome.shell.extensions.tokengrill')
     errors.push('Unexpected settings schema.');
 // PRACTICES 3.2: letters, numbers, space and period, 1 to 16 characters.
@@ -68,7 +68,8 @@ const forbidden = [
     new RegExp(["'\\.t3'", "'userdata'"].join(',\\s*')),
 ];
 const textExtensions = new Set(['.md', '.json', '.mjs', '.js', '.ts', '.xml', '.sh', '.css', '.svg', '.txt']);
-const scanned = await listFiles(root, new Set(['.git', 'node_modules', 'dist', 'build', 'venv']));
+const scanned = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], {cwd: root, encoding: 'utf8'})
+    .split('\0').filter(Boolean).map(file => path.join(root, file));
 // The checker and the rulebook name the patterns in order to ban them.
 const traceRules = new Set(['tools/release-check.mjs', 'PRACTICES.md']);
 for (const file of scanned.filter(name => textExtensions.has(path.extname(name)))) {

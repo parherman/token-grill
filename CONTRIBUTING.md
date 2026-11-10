@@ -11,7 +11,7 @@ commit messages, refer to rules by their ID, for example `L-3` or `T-3` (H-6).
 
 ## Before you start
 
-Token Grill operates with GNOME Shell 50. The extension uses GJS and GNOME
+Token Grill operates with GNOME Shell 50 and 51. The extension uses GJS and GNOME
 libraries. You need Node.js only to build and test the TypeScript source.
 
 Install the JavaScript dependencies:
@@ -22,7 +22,7 @@ npm ci
 
 You must also have these items:
 
-- GNOME Shell 50 with `gjs`, `gnome-extensions`, and `glib-compile-schemas`.
+- GNOME Shell 50 or 51 with `gjs`, `gnome-extensions`, and `glib-compile-schemas`.
 - The Mutter devkit (`/usr/libexec/mutter-devkit`) for the nested shell. On
   Debian or Ubuntu, the package is `mutter-dev-bin`.
 - [`uv`](https://docs.astral.sh/uv/) for the GNOME Extensions review scan.
@@ -44,6 +44,7 @@ npm run review:check   # pack the ZIP and scan dist/ and the ZIP with Shexli
 
 Then do the test in a nested shell. The procedure is below. PRACTICES T-3
 makes this test necessary for each change to the Shell code.
+Test each supported Shell version before release.
 
 To make a release archive, run this command:
 
@@ -92,6 +93,8 @@ The pack and review commands do these steps:
 - `npm run review:check` packs the extension. Then it scans `dist/` and the
   upload ZIP with Shexli 0.2.1 and tree-sitter 0.25.2. The fixed tree-sitter
   version prevents a known problem in the dependency range of Shexli 0.2.1.
+  Shexli 0.2.1 rejects GNOME Shell 51 as a future version (EGO-M-004). This
+  finding blocks release until Shexli supports 51; the check does not suppress it.
 
 ## Do a test in a nested shell
 
