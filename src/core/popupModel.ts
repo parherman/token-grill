@@ -4,7 +4,7 @@ import {formatTokenCount, type HistoryMetrics} from './historyMetrics.js';
 import {formatText, type Translator} from './i18n.js';
 import {providerMetadata} from './providerMetadata.js';
 import {durationUntil, formatDuration} from './timeMath.js';
-import type {ProviderInstance, ProviderKind, ProviderRuntimeState, ProviderSnapshot, UsageWindow} from './types.js';
+import type {LimitResetCredit, ProviderInstance, ProviderKind, ProviderRuntimeState, ProviderSnapshot, UsageWindow} from './types.js';
 
 export interface ChooserAccount {
     id: string;
@@ -73,25 +73,37 @@ function quotaValueLabel(tr: Translator, window: Partial<UsageWindow>): string {
     return formatText(_('%s of %s credits'), used, formatQuotaNumber(window.limit));
 }
 
-export function windowCaption(tr: Translator, window: Partial<UsageWindow> | null, now = Date.now()): string {
+export function windowCaption(tr: Translator, window: Partial<UsageWindow> | null, dateTime: (timestamp: number) => string, now = Date.now()): string {
     const {_} = tr;
     if (!window)
         return _('No data yet');
     const quota = quotaValueLabel(tr, window);
-    const parts = durationUntil(window.resetAt ?? null, now);
-    const resetsNow = parts !== null && (parts.expired || parts.totalMinutes < 1);
-    if (quota) {
-        if (!parts)
-            return formatText(_('%s · reset time unknown'), quota);
-        if (resetsNow)
-            return formatText(_('%s · resets now'), quota);
-        return formatText(_('%s · resets in %s'), quota, formatDuration(tr, parts, true));
+    const resetAt = window.resetAt ?? null;
+    const parts = durationUntil(resetAt, now);
+    if (!parts || resetAt === null || Number.isNaN(new Date(resetAt).getTime())) {
+        const unknown = _('Reset time unknown');
+        return quota ? formatText(_('%s · %s'), quota, unknown) : unknown;
     }
-    if (!parts)
-        return _('Reset time unknown');
-    if (resetsNow)
-        return _('Resets now');
-    return formatText(_('Resets in %s'), formatDuration(tr, parts, true));
+    let reset: string;
+    if (parts.expired && resetAt < now)
+        reset = formatText(_('Reset time passed (%s)'), dateTime(resetAt));
+    else if (parts.totalMinutes < 1)
+        reset = formatText(_('Resets now (%s)'), dateTime(resetAt));
+    else
+        reset = formatText(_('Resets in %s (%s)'), formatDuration(tr, parts, true), dateTime(resetAt));
+    return quota ? formatText(_('%s · %s'), quota, reset) : reset;
+}
+
+export function creditExpiryText(tr: Translator, credit: LimitResetCredit, dateTime: (timestamp: number) => string, now = Date.now()): string {
+    const {_} = tr;
+    const title = credit.title || _('Usage-limit reset');
+    const expiresAt = credit.expiresAt;
+    const parts = durationUntil(expiresAt, now);
+    if (!parts || expiresAt === null || Number.isNaN(new Date(expiresAt).getTime()))
+        return formatText(_('%s · Expiry unavailable'), title);
+    if (parts.expired)
+        return formatText(_('%s · Expired (%s)'), title, dateTime(expiresAt));
+    return formatText(_('%s · Expires in %s (%s)'), title, formatDuration(tr, parts, true), dateTime(expiresAt));
 }
 
 function updatedText(tr: Translator, clockText: string, fetchedAt: number, now: number): string {

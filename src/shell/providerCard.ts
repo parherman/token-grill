@@ -12,9 +12,8 @@ import * as BarLevel from 'resource:///org/gnome/shell/ui/barLevel.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import {displayLabel, displayPercent, pressureClass, selectWindow} from '../core/display.js';
 import {historyMetrics} from '../core/historyMetrics.js';
-import {errorText, historySummary, refreshStatusText, windowCaption} from '../core/popupModel.js';
+import {creditExpiryText, errorText, historySummary, refreshStatusText, windowCaption} from '../core/popupModel.js';
 import {providerMetadata} from '../core/providerMetadata.js';
-import {durationUntil, formatDuration} from '../core/timeMath.js';
 import type {
     CanonicalQuotaWindow,
     LimitResetCreditSummary,
@@ -59,9 +58,9 @@ function clockLabel(timestamp: number): string {
     return formatTime(new Date(timestamp), {timeOnly: true});
 }
 
-function countdown(timestamp: number): string {
-    const parts = durationUntil(timestamp);
-    return parts ? formatDuration(TRANSLATOR, parts) : '';
+function dateTimeLabel(timestamp: number): string {
+    const date = new Date(timestamp);
+    return _('%s, %s').format(date.toLocaleDateString(undefined, {year: 'numeric', month: 'short', day: 'numeric'}), clockLabel(timestamp));
 }
 
 // Display-only rows stay reactive (so the theme does not render them as
@@ -203,14 +202,14 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
         this._value.set_text(value);
         this._meter.value = percent ?? 0;
         this._meter.visible = percent !== null;
-        this._caption.set_text(windowCaption(TRANSLATOR, window));
+        this._caption.set_text(windowCaption(TRANSLATOR, window, dateTimeLabel));
         // Pressure is shown with an icon as well as the number, never colour alone.
         this._warning.visible = pressure !== 'neutral';
         this.setOrnament(selected ? PopupMenu.Ornament.DOT : PopupMenu.Ornament.NO_DOT);
 
         const parts = [this._title, value];
-        if (window?.resetAt)
-            parts.push(_('resets in %s').format(countdown(window.resetAt)));
+        if (window)
+            parts.push(this._caption.text);
         if (pressure === 'critical')
             parts.push(_('almost exhausted'));
         else if (pressure === 'warning')
@@ -341,12 +340,12 @@ export class ProviderDetail extends PopupMenu.PopupMenuSection {
         }
         this._credits.label.set_text(creditsMenuText(summary, count));
         this._credits.accessible_name = this._credits.label.text;
-        const key = JSON.stringify([count, summary.stale, summary.fetchedAt, summary.credits]);
+        const credits = summary.credits.map(credit => creditExpiryText(TRANSLATOR, credit, dateTimeLabel));
+        const key = JSON.stringify([count, summary.stale, summary.fetchedAt, credits]);
         if (key === this._creditsKey)
             return;
         this._creditsKey = key;
         this._credits.menu.removeAll();
-        const credits = summary.credits;
         if (credits.length < count) {
             const note = new InfoItem();
             if (credits.length)
@@ -355,13 +354,9 @@ export class ProviderDetail extends PopupMenu.PopupMenuSection {
                 note.setText(ngettext('%d usage-limit reset available', '%d usage-limit resets available', count).format(count));
             this._credits.menu.addMenuItem(note);
         }
-        for (const credit of credits) {
-            const title = credit.title || _('Usage-limit reset');
+        for (const text of credits) {
             const row = new InfoItem();
-            if (credit.expiresAt)
-                row.setText(_('%s · expires %s (in %s)').format(title, formatTime(new Date(credit.expiresAt)), countdown(credit.expiresAt)));
-            else
-                row.setText(_('%s · expiry unavailable').format(title));
+            row.setText(text);
             this._credits.menu.addMenuItem(row);
         }
     }
