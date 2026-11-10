@@ -4,6 +4,8 @@
 
 - Support GNOME Shell 51.
 - Hide unavailable weekly quotas in the popup.
+- Show the reset date and time below quotas in the popup, and identify reset times
+  that have already passed.
 
 ## 0.3.1
 

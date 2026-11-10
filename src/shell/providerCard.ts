@@ -59,6 +59,11 @@ function clockLabel(timestamp: number): string {
     return formatTime(new Date(timestamp), {timeOnly: true});
 }
 
+function dateTimeLabel(timestamp: number): string {
+    const date = new Date(timestamp);
+    return _('%s, %s').format(date.toLocaleDateString(undefined, {year: 'numeric', month: 'short', day: 'numeric'}), clockLabel(timestamp));
+}
+
 function countdown(timestamp: number): string {
     const parts = durationUntil(timestamp);
     return parts ? formatDuration(TRANSLATOR, parts) : '';
@@ -203,14 +208,14 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
         this._value.set_text(value);
         this._meter.value = percent ?? 0;
         this._meter.visible = percent !== null;
-        this._caption.set_text(windowCaption(TRANSLATOR, window));
+        this._caption.set_text(windowCaption(TRANSLATOR, window, dateTimeLabel));
         // Pressure is shown with an icon as well as the number, never colour alone.
         this._warning.visible = pressure !== 'neutral';
         this.setOrnament(selected ? PopupMenu.Ornament.DOT : PopupMenu.Ornament.NO_DOT);
 
         const parts = [this._title, value];
-        if (window?.resetAt)
-            parts.push(_('resets in %s').format(countdown(window.resetAt)));
+        if (window)
+            parts.push(this._caption.text);
         if (pressure === 'critical')
             parts.push(_('almost exhausted'));
         else if (pressure === 'warning')
