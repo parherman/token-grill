@@ -3,6 +3,7 @@
 ## 0.4.0 alpha 2
 
 - Token Grill also operates with GNOME Shell 48, 49, and 51.
+- Show usage pace below quotas in the popup.
 
 ## 0.4.0 alpha 1
 
