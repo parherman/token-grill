@@ -67,12 +67,14 @@ function inPopupOrder(keys: string[], snapshot: WindowsOf): string[] {
     return [...known, ...keys.filter(key => !order.includes(key))];
 }
 
-// The first click while automatic keeps what was showing, so nothing vanishes;
-// clicking the limit automatic had chosen just pins it.
 export function toggleLimit(instance: Pick<ProviderInstance, 'topBar'>, key: string, snapshot: WindowsOf): TopBarSelection {
     if (instance.topBar.automatic) {
         const [pressing] = shownLimits(instance, snapshot);
         const kept = pressing ? limitKey(pressing) : key;
+        // With no automatic switch for a sole quota, the checked row acts as an on/off control.
+        if (snapshot?.windows.length === 1 && pressing && kept === key)
+            return {automatic: false, limits: []};
+        // Keep the automatically shown quota when the user switches to manual selection.
         return {automatic: false, limits: inPopupOrder([...new Set([kept, key])], snapshot)};
     }
     const current = instance.topBar.limits;

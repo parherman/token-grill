@@ -101,8 +101,7 @@ test('refresh progress uses the native shell spinner and UI uses centralized pac
 test('Kiro details are monthly-only and show precise credits', async () => {
     const [dashboard, model, names] = await Promise.all([read('src/shell/providerCard.ts'), read('src/core/popupModel.ts'), read('src/core/display.ts')]);
     assert.match(names, /return _\('Monthly'\)/);
-    // Before the first reading, rows come from the limits the service is known to have.
-    assert.match(dashboard, /providerMetadata\(instance\.kind\)\.quotaWindows\.map/);
+    assert.match(dashboard, /return orderedLimits\(snapshot\)\.map/);
     assert.match(model, /_\('%s of %s credits'\), used, formatQuotaNumber\(window\.limit\)/);
     assert.match(model, /pooled or unlimited/);
 });
