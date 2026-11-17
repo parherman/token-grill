@@ -38,10 +38,12 @@ const APP_NAMES: Record<AccountApp, string> = {
     'keyring': 'GNOME Keyring',
     'claude-settings': 'Claude Code',
     'kimi-cli': 'Kimi CLI',
+    'cursor-ide': 'Cursor IDE',
+    'cursor-agent': 'Cursor Agent',
 };
 
 // Apps whose sign-in is a file in the account home, so the home and file can be changed.
-const FILE_APPS: AccountApp[] = ['codex-cli', 'claude-code', 'kiro-cli', 'antigravity', 'github-cli', 'claude-settings', 'kimi-cli'];
+const FILE_APPS: AccountApp[] = ['codex-cli', 'claude-code', 'kiro-cli', 'antigravity', 'github-cli', 'claude-settings', 'kimi-cli', 'cursor-ide', 'cursor-agent'];
 
 function validationMessage(code: ProviderValidationCode): string {
     const messages: Record<ProviderValidationCode, string> = {

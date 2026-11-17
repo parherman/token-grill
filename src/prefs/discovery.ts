@@ -72,3 +72,10 @@ export function githubCliHomes(): ProviderInstance[] {
     const provider = newProvider('copilot', 'github-cli', defaultHome('copilot'));
     return hasCredentials(provider) ? [provider] : [];
 }
+
+export function cursorHomes(app: 'cursor-ide' | 'cursor-agent'): ProviderInstance[] {
+    const home = app === 'cursor-ide' ? defaultHome('cursor') : GLib.build_filenamev([GLib.get_user_config_dir(), 'cursor']);
+    const provider = newProvider('cursor', app, home);
+    provider.displayName = app === 'cursor-ide' ? 'Cursor IDE' : 'Cursor Agent';
+    return hasCredentials(provider) ? [provider] : [];
+}

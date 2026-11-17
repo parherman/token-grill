@@ -7,6 +7,7 @@ import {antigravityCredentialStatus} from '../providers/antigravity/auth.js';
 import {loadClaudeAccessToken} from '../providers/claude/auth.js';
 import {loadCodexAccessToken} from '../providers/codex/auth.js';
 import {loadCopilotToken} from '../providers/copilot/auth.js';
+import {CursorAuthStore} from '../providers/cursor/auth.js';
 import {loadDeepSeekKey} from '../providers/deepseek/auth.js';
 import {loadKimiAuth} from '../providers/kimi/auth.js';
 import {kiroCredentialStatus} from '../providers/kiro/auth.js';
@@ -23,7 +24,7 @@ export type CredentialState =
     | 'gda-missing'
     | 'libsecret-missing';
 
-async function authFileState(load: Promise<unknown>): Promise<CredentialState> {
+async function authFileState(load: Promise<unknown>, dependency: 'gda-missing' | 'libsecret-missing' = 'libsecret-missing'): Promise<CredentialState> {
     try {
         await load;
         return 'authenticated';
@@ -35,7 +36,7 @@ async function authFileState(load: Promise<unknown>): Promise<CredentialState> {
         if (error.code === 'auth-invalid' || error.code === 'permission')
             return 'unreadable';
         if (error.code === 'dependency')
-            return 'libsecret-missing';
+            return dependency;
         return 'login-required';
     }
 }
@@ -61,6 +62,7 @@ const CREDENTIAL_CHECKS: Record<ProviderKind, (provider: ProviderInstance, cance
     'opencode-go': (_provider, cancellable) => authFileState(loadOpenCodeGoKey(cancellable)),
     'deepseek': (provider, cancellable) => authFileState(loadDeepSeekKey(provider, cancellable)),
     'kimi': (provider, cancellable) => authFileState(loadKimiAuth(provider, cancellable)),
+    cursor: (provider, cancellable) => authFileState(new CursorAuthStore().load(provider, cancellable), 'gda-missing'),
 };
 
 // Rejects only when cancelled or on an unexpected error.

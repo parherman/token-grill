@@ -174,6 +174,7 @@ function withSignInHint(tr: Translator, kind: ProviderKind, app: AccountApp, mes
         'opencode-go': _('%s Run opencode auth login.'),
         'deepseek': _('%s Check the DeepSeek API key in Preferences.'),
         'kimi': _('%s Start kimi and run /login.'),
+        cursor: _('%s Open Cursor and sign in again, or run agent login.'),
     };
     return formatText(templates[kind], message);
 }

@@ -3,6 +3,8 @@
 ## 0.4.0 alpha 2
 
 - Token Grill also operates with GNOME Shell 48, 49, and 51.
+- Monitor the current allowance for Cursor IDE and Agent accounts that store
+  readable local credentials.
 
 ## 0.4.0 alpha 1
 

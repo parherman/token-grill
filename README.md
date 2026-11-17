@@ -12,7 +12,7 @@ you can see the remaining usage of each account and the reset times.
 These are the functions of the top bar and the popup:
 
 - Token Grill monitors Codex, Claude, Kiro, Antigravity, GitHub Copilot,
-  OpenCode Go, and Kimi Code accounts, and the DeepSeek balance. You can add
+  OpenCode Go, Kimi Code, and Cursor accounts, and the DeepSeek balance. You can add
   more than one account for each service.
 - The top bar shows one entry for each service. Each entry shows the limits
   that you checked for each account, as text, as rings, or as bars.
@@ -89,6 +89,7 @@ These are the apps that Token Grill reads:
 | -------------- | -------------------------------------------------------- |
 | Codex          | Codex CLI, OpenCode                                      |
 | Claude         | Claude Code, OpenCode                                    |
+| Cursor         | Cursor IDE, Cursor Agent                                |
 | Kiro           | Kiro CLI                                                 |
 | Antigravity    | Antigravity, Antigravity CLI                             |
 | GitHub Copilot | GitHub CLI, Copilot CLI, OpenCode                        |
@@ -110,7 +111,7 @@ distribution:
 
 | Service                                       | Library                          | Debian or Ubuntu package |
 | --------------------------------------------- | -------------------------------- | ------------------------ |
-| Kiro                                          | Gda 5.0 with the SQLite provider | `gir1.2-gda-5.0`         |
+| Kiro and Cursor IDE                           | Gda 5.0 with the SQLite provider | `gir1.2-gda-5.0`         |
 | Antigravity CLI (keyring sign-in)             | libsecret 1                      | `gir1.2-secret-1`        |
 | GitHub Copilot (keyring sign-in)              | libsecret 1                      | `gir1.2-secret-1`        |
 | DeepSeek (a key that you paste)               | libsecret 1                      | `gir1.2-secret-1`        |
@@ -121,7 +122,7 @@ accounts continue to operate.
 
 ## Privacy and network access
 
-Token Grill reads the credentials that the CLI of each service stored on this
+Token Grill reads the credentials that the apps and CLIs stored on this
 computer. It sends these credentials only to that service. Token Grill
 connects only to these hosts:
 
@@ -133,6 +134,7 @@ connects only to these hosts:
 | Kiro        | `oidc.<region>.amazonaws.com`                                                                                 | A new token when the sign-in is expired |
 | Antigravity | `cloudcode-pa.googleapis.com`                                                                                 | Plan and usage limits                   |
 | Antigravity | `oauth2.googleapis.com`                                                                                       | A new token when the sign-in is expired |
+| Cursor      | `api2.cursor.sh`                                                                                              | Usage limits                            |
 | Copilot     | `api.github.com`                                                                                              | Monthly allowances                      |
 | OpenCode Go | `opencode.ai`                                                                                                 | Usage limits                            |
 | DeepSeek    | `api.deepseek.com`                                                                                            | Prepaid balance                         |
@@ -148,7 +150,7 @@ Each request obeys these limits:
 Each request uses this User-Agent:
 
 ```text
-TokenGrill (+https://github.com/sh02sahil/token-grill; usage monitor for Codex, Claude, Kiro, Antigravity, Copilot, OpenCode Go, DeepSeek and Kimi Code)
+TokenGrill (+https://github.com/sh02sahil/token-grill; usage monitor for Codex, Claude, Kiro, Antigravity, Copilot, OpenCode Go, DeepSeek, Kimi Code and Cursor)
 ```
 
 The Antigravity quota service gives data only when the User-Agent contains
@@ -208,6 +210,39 @@ For the new services, Token Grill reads these files and keyring items:
 If a Kiro or Antigravity access token is expired, Token Grill gets a new token.
 It keeps the new token only in memory. It does not write the token to the files
 or the keyring of the service.
+
+### Cursor accounts
+
+Cursor IDE credentials are read from `<home>/User/globalStorage/state.vscdb`.
+The default home is `Cursor` in the system configuration directory
+(`$XDG_CONFIG_HOME`, normally `~/.config`). Cursor Agent credentials are read
+from `<home>/auth.json`; its default directory is lowercase `cursor` in the
+same configuration directory. **Discover…** names them **Cursor IDE** and
+**Cursor Agent**.
+
+Discovery checks only the default directories. After adding a detected account,
+set **Account Home** to its IDE user-data directory or Agent credential directory,
+or use **Sign-In File Override** to select a `.vscdb` or `.json` file directly.
+Each configured home is a separate account. For an IDE account, the
+database takes precedence over a JSON fallback in that home. An Agent account
+reads its own `auth.json` file. JWT access tokens use their
+account identity; opaque `curs` tokens require a valid `authId` in the IDE
+cached scoped profile. Encrypted Cursor IDE sign-ins are unsupported. If your
+IDE stores an encrypted sign-in, try adding a separate Cursor Agent account
+after running `agent login`.
+Token Grill does not switch accounts after a sign-in failure. Open Cursor and
+sign in again, or run `agent login`, when a session expires.
+
+Cursor shows the primary allowance and reset time. The current-period usage
+endpoint supplies subscription usage; Enterprise accounts can use the personal
+current overall budget from the usage summary when the current-period response
+reports no billing period. Weekly and monthly labels follow the
+reported period boundaries; other periods show **Current period**. A missing
+usage allowance is reported as unavailable. Confirmed unlimited or disabled
+allowances clear cached quotas; malformed responses retain the error state.
+
+Cursor's read-only usage API is undocumented and can change. Cursor IDE accounts
+use Gda 5.0 with SQLite, including database changes held in the WAL file.
 
 ### Files of Token Grill
 

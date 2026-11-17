@@ -1,9 +1,10 @@
-export type ProviderKind = 'codex' | 'claude' | 'kiro' | 'antigravity' | 'copilot' | 'opencode-go' | 'deepseek' | 'kimi';
+export type ProviderKind = 'codex' | 'claude' | 'kiro' | 'antigravity' | 'copilot' | 'opencode-go' | 'deepseek' | 'kimi' | 'cursor';
 export type AccentColor = 'blue' | 'teal' | 'green' | 'yellow' | 'orange' | 'red' | 'pink' | 'purple' | 'slate';
 // A palette name, or a colour the user picked as #rrggbb.
 export type AccentValue = AccentColor | `#${string}`;
 // The app whose sign-in an account reads.
-export type AccountApp = 'codex-cli' | 'claude-code' | 'kiro-cli' | 'antigravity' | 'opencode' | 'github-cli' | 'copilot-cli' | 'keyring' | 'claude-settings' | 'kimi-cli';
+export type AccountApp = 'codex-cli' | 'claude-code' | 'kiro-cli' | 'antigravity' | 'opencode' | 'github-cli' | 'copilot-cli' | 'keyring' | 'claude-settings' | 'kimi-cli'
+    | 'cursor-ide' | 'cursor-agent';
 export type QuotaWindowPreference = 'automatic' | 'five-hour' | 'weekly' | 'monthly';
 export type PanelPercentageMode = 'remaining' | 'used';
 export type PanelDisplayStyle = 'text' | 'ring' | 'bar';
