@@ -3,6 +3,9 @@
 ## 0.4.0 alpha 2
 
 - Token Grill also operates with GNOME Shell 48, 49, and 51.
+- Show the reset date and time below quotas in the popup, and identify reset times
+  that have already passed.
+- Align reset-credit expiry text with quota reset text.
 
 ## 0.4.0 alpha 1
 
