@@ -212,6 +212,7 @@ export class TokenGrillIndicator extends PanelMenu.Button {
     private _openStateId: number | null = null;
     private _entries = new Map<ProviderKind, St.BoxLayout>();
     private _accountMenuKey = '';
+    private _state: IndicatorState | null = null;
 
     constructor(extensionPath: string, controller: IndicatorController) {
         super(0.5, _('Token Grill'));
@@ -254,6 +255,8 @@ export class TokenGrillIndicator extends PanelMenu.Button {
             const hovered = [...this._entries].find(([, entry]) => entry.hover);
             if (open && hovered)
                 controller.selectService(hovered[0]);
+            if (open && this._state)
+                this._renderMenu(this._state);
         });
 
         this._themeContext = St.ThemeContext.get_for_stage(global.stage);
@@ -281,6 +284,7 @@ export class TokenGrillIndicator extends PanelMenu.Button {
     }
 
     update(state: IndicatorState): void {
+        this._state = state;
         this._updateThemeClasses();
         this._renderPanel(state);
         this._renderMenu(state);
@@ -359,6 +363,7 @@ export class TokenGrillIndicator extends PanelMenu.Button {
     }
 
     override destroy(): void {
+        this._state = null;
         (this.menu as PopupMenu.PopupMenu).disconnect(this._openStateId!);
         this._openStateId = null;
         this._themeContext!.disconnect(this._themeChangedId!);

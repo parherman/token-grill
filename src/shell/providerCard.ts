@@ -13,7 +13,7 @@ import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import {displayLabel, displayPercent, formatMoney, limitName, pressureClass} from '../core/display.js';
 import {historyMetrics} from '../core/historyMetrics.js';
 import {formatText} from '../core/i18n.js';
-import {errorText, historySummary, refreshStatusText, windowCaption} from '../core/popupModel.js';
+import {errorText, historySummary, refreshStatusText, windowCaption, windowPace} from '../core/popupModel.js';
 import {providerMetadata} from '../core/providerMetadata.js';
 import {durationUntil, formatDuration} from '../core/timeMath.js';
 import {isShown, limitKey, orderedLimits, shownLimits} from '../core/topBar.js';
@@ -159,6 +159,7 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
     private _value: St.Label;
     private _meter: BarLevel.BarLevel;
     private _caption: St.Label;
+    private _pace: St.Label;
 
     constructor(title: string, onSelect: () => void) {
         super({style_class: 'tokengrill-window-item'});
@@ -183,9 +184,11 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
             accessible_name: _('%s usage').format(title),
         });
         this._caption = wrappingLabel('tokengrill-caption');
+        this._pace = wrappingLabel('tokengrill-caption');
         box.add_child(head);
         box.add_child(this._meter);
         box.add_child(this._caption);
+        box.add_child(this._pace);
         this.add_child(box);
         this.label_actor = nameLabel;
     }
@@ -194,7 +197,7 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
         this._onSelect();
     }
 
-    update(window: UsageWindow | null, mode: PanelPercentageMode, shown: boolean, automatic: boolean): void {
+    update(window: UsageWindow | null, mode: PanelPercentageMode, shown: boolean, automatic: boolean, state: ProviderSnapshot['state'] | undefined): void {
         const percent = displayPercent(window, mode);
         const pressure = pressureClass(window);
         const value = window ? displayLabel(TRANSLATOR, window, mode) : _('Unavailable');
@@ -209,6 +212,9 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
             if (pressure !== 'neutral')
                 actor.add_style_class_name(`tokengrill-${pressure}`);
         }
+        const pace = state === 'ready' ? windowPace(TRANSLATOR, window) : null;
+        this._pace.set_text(pace ?? '');
+        this._pace.visible = pace !== null;
         // Pressure is shown with an icon as well as the number, never colour alone.
         this._warning.visible = pressure !== 'neutral';
         this.setOrnament(shown ? PopupMenu.Ornament.CHECK : PopupMenu.Ornament.NONE);
@@ -216,6 +222,8 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
         const parts = [this._title, value];
         if (window?.resetAt)
             parts.push(_('resets in %s').format(countdown(window.resetAt)));
+        if (pace)
+            parts.push(pace);
         if (pressure === 'critical')
             parts.push(_('almost exhausted'));
         else if (pressure === 'warning')
@@ -327,7 +335,7 @@ export class ProviderDetail extends PopupMenu.PopupMenuSection {
             });
         }
         const shown = new Set(shownLimits(instance, snapshot).map(limitKey));
-        rows.forEach((row, index) => this._limits[index]!.update(row.window, mode, shown.has(row.key), instance.topBar.automatic));
+        rows.forEach((row, index) => this._limits[index]!.update(row.window, mode, shown.has(row.key), instance.topBar.automatic, snapshot?.state));
         this._legend.setText(isShown(instance)
             ? _('Checked limits are shown in the top bar')
             : _('Not shown in the top bar. Check a limit to show it.'));
