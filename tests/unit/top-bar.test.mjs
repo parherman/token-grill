@@ -25,6 +25,14 @@ test('first click on the automatic limit pins it', () => {
     assert.deepEqual(toggleLimit(account('a', 'claude', auto), 'weekly', snapshot([fiveHour, weekly])), {automatic: false, limits: ['weekly']});
 });
 
+test('clicking the sole automatically shown quota removes it from the top bar', () => {
+    const data = snapshot([{...fiveHour, percent: 0}]);
+    const removed = toggleLimit(account('a', 'codex', auto), 'five-hour', data);
+    assert.deepEqual(removed, {automatic: false, limits: []});
+    const restored = toggleLimit(account('a', 'codex', removed), 'five-hour', data);
+    assert.deepEqual(shownLimits({topBar: restored}, data), data.windows);
+});
+
 test('later clicks toggle, and unticking the last limit hides the account', () => {
     const data = snapshot([fiveHour, weekly]);
     const added = toggleLimit(account('a', 'claude', {automatic: false, limits: ['weekly']}), 'five-hour', data);

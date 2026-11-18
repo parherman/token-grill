@@ -3,6 +3,8 @@
 ## 0.4.0 alpha 2
 
 - Token Grill also operates with GNOME Shell 48, 49, and 51.
+- Hide unavailable quotas in the popup.
+- Show Pick Automatically only when the account has multiple quota rows.
 
 ## 0.4.0 alpha 1
 

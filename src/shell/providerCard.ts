@@ -37,7 +37,7 @@ export interface ProviderDetailActions {
 interface LimitRow {
     key: string;
     title: string;
-    window: UsageWindow | null;
+    window: UsageWindow;
 }
 
 function label(text: string, styleClass: string, params: Partial<St.Label.ConstructorProps> = {}): St.Label {
@@ -194,10 +194,10 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
         this._onSelect();
     }
 
-    update(window: UsageWindow | null, mode: PanelPercentageMode, shown: boolean, automatic: boolean): void {
+    update(window: UsageWindow, mode: PanelPercentageMode, shown: boolean, automatic: boolean): void {
         const percent = displayPercent(window, mode);
         const pressure = pressureClass(window);
-        const value = window ? displayLabel(TRANSLATOR, window, mode) : _('Unavailable');
+        const value = displayLabel(TRANSLATOR, window, mode);
         this._value.set_text(value);
         this._meter.value = percent ?? 0;
         this._meter.visible = percent !== null;
@@ -214,7 +214,7 @@ class WindowItem extends PopupMenu.PopupBaseMenuItem {
         this.setOrnament(shown ? PopupMenu.Ornament.CHECK : PopupMenu.Ornament.NONE);
 
         const parts = [this._title, value];
-        if (window?.resetAt)
+        if (window.resetAt)
             parts.push(_('resets in %s').format(countdown(window.resetAt)));
         if (pressure === 'critical')
             parts.push(_('almost exhausted'));
@@ -300,21 +300,13 @@ export class ProviderDetail extends PopupMenu.PopupMenuSection {
             callback(this._instance);
     }
 
-    // The limits the service reported, or before the first reading the ones it is known to have.
-    private _rows(instance: ProviderInstance, snapshot: ProviderSnapshot | null): LimitRow[] {
-        const windows = orderedLimits(snapshot);
-        if (windows.length)
-            return windows.map(window => ({key: limitKey(window), title: limitName(TRANSLATOR, window), window}));
-        return providerMetadata(instance.kind).quotaWindows.map(canonicalWindow => ({
-            key: canonicalWindow,
-            title: limitName(TRANSLATOR, {id: canonicalWindow, canonicalWindow, label: ''}),
-            window: null,
-        }));
+    private _rows(snapshot: ProviderSnapshot | null): LimitRow[] {
+        return orderedLimits(snapshot).map(window => ({key: limitKey(window), title: limitName(TRANSLATOR, window), window}));
     }
 
     // Rows are rebuilt only when the set of limits changes, so keyboard focus survives refreshes.
     private _updateLimits(instance: ProviderInstance, snapshot: ProviderSnapshot | null, mode: PanelPercentageMode): void {
-        const rows = this._rows(instance, snapshot);
+        const rows = this._rows(snapshot);
         const keys = JSON.stringify(rows.map(row => [row.key, row.title]));
         if (keys !== this._limitKeys) {
             this._limitKeys = keys;
@@ -327,11 +319,15 @@ export class ProviderDetail extends PopupMenu.PopupMenuSection {
             });
         }
         const shown = new Set(shownLimits(instance, snapshot).map(limitKey));
-        rows.forEach((row, index) => this._limits[index]!.update(row.window, mode, shown.has(row.key), instance.topBar.automatic));
-        this._legend.setText(isShown(instance)
+        const canPickAutomatically = rows.length > 1;
+        const automatic = canPickAutomatically && instance.topBar.automatic;
+        rows.forEach((row, index) => this._limits[index]!.update(row.window, mode, shown.has(row.key), automatic));
+        const hasRows = rows.length > 0;
+        const legend = isShown(instance)
             ? _('Checked limits are shown in the top bar')
-            : _('Not shown in the top bar. Check a limit to show it.'));
-        this._automatic.visible = rows.length > 0;
+            : _('Not shown in the top bar. Check a limit to show it.');
+        this._legend.setText(hasRows ? legend : null);
+        this._automatic.visible = canPickAutomatically;
         this._automatic.setToggleState(instance.topBar.automatic);
     }
 
