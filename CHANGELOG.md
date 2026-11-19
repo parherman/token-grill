@@ -7,6 +7,7 @@
 - Monitor the current allowance for Cursor IDE and Agent accounts that store
   readable local credentials.
 - Read encrypted Cursor IDE sign-ins that use the Linux Secret Service.
+- Keep encrypted Cursor IDE sign-ins readable after the keyring discards a session.
 - Show usage pace for Cursor quotas with a known billing period.
 
 ## 0.4.0 alpha 1

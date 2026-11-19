@@ -46,7 +46,8 @@ export async function readCursorDatabase(path: string, cancellable: Gio.Cancella
     let {accessToken} = record;
     if (typeof accessToken === 'string' && accessToken.startsWith(ENCRYPTED_TOKEN_PREFIX)) {
         const ciphertext = decodeCursorCiphertext(accessToken.slice(ENCRYPTED_TOKEN_PREFIX.length));
-        const password = await lookupSecret(KEYRING_SCHEMA, KEYRING_ATTRIBUTES, cancellable ?? new Gio.Cancellable(), KEYRING_TEXTS);
+        // A long-running Shell can hold a shared libsecret session that the keyring has discarded.
+        const password = await lookupSecret(KEYRING_SCHEMA, KEYRING_ATTRIBUTES, cancellable ?? new Gio.Cancellable(), KEYRING_TEXTS, 'fresh');
         if (!password)
             throw new CollectorError('dependency', ({_}) => _('The Cursor Safe Storage key is unavailable in the system keyring.'));
         accessToken = decryptCursorCiphertext(ciphertext, password);
