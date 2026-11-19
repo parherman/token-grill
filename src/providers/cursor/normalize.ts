@@ -10,10 +10,10 @@ export function cursorTimestamp(value: unknown): number | null {
     return result !== null && result > 0 ? result : null;
 }
 
-function period(start: number | null, end: number | null): CanonicalQuotaWindow {
-    if (start === null || end === null || end <= start)
+function period(durationMs: number | null): CanonicalQuotaWindow {
+    if (durationMs === null)
         return 'other';
-    const days = (end - start) / DAY_MS;
+    const days = durationMs / DAY_MS;
     if (Math.abs(days - 7) < 1 / DAY_MS)
         return 'weekly';
     return days >= 27 && days <= 32 ? 'monthly' : 'other';
@@ -51,7 +51,8 @@ export function normalizeCursorUsage(payload: unknown, {_}: Translator): UsageWi
         return null;
     const start = cursorTimestamp(payload.billingCycleStart);
     const end = cursorTimestamp(payload.billingCycleEnd);
-    const canonicalWindow = period(start, end);
+    const durationMs = start !== null && end !== null && end > start ? end - start : null;
+    const canonicalWindow = period(durationMs);
     let label = _('Current period');
     if (canonicalWindow === 'weekly')
         label = _('Weekly');
@@ -65,6 +66,7 @@ export function normalizeCursorUsage(payload: unknown, {_}: Translator): UsageWi
         limit: null,
         percent: clampFraction(fraction),
         resetAt: end,
+        durationSeconds: durationMs === null ? null : durationMs / 1000,
         unit: null,
     }];
 }

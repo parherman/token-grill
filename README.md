@@ -112,6 +112,7 @@ distribution:
 | Service                                       | Library                          | Debian or Ubuntu package |
 | --------------------------------------------- | -------------------------------- | ------------------------ |
 | Kiro and Cursor IDE                           | Gda 5.0 with the SQLite provider | `gir1.2-gda-5.0`         |
+| Cursor IDE (encrypted sign-in)                | libsecret 1                      | `gir1.2-secret-1`        |
 | Antigravity CLI (keyring sign-in)             | libsecret 1                      | `gir1.2-secret-1`        |
 | GitHub Copilot (keyring sign-in)              | libsecret 1                      | `gir1.2-secret-1`        |
 | DeepSeek (a key that you paste)               | libsecret 1                      | `gir1.2-secret-1`        |
@@ -227,9 +228,10 @@ Each configured home is a separate account. For an IDE account, the
 database takes precedence over a JSON fallback in that home. An Agent account
 reads its own `auth.json` file. JWT access tokens use their
 account identity; opaque `curs` tokens require a valid `authId` in the IDE
-cached scoped profile. Encrypted Cursor IDE sign-ins are unsupported. If your
-IDE stores an encrypted sign-in, try adding a separate Cursor Agent account
-after running `agent login`.
+cached scoped profile. For encrypted IDE sign-ins that use Electron's Linux
+`v11` format, Token Grill reads the Cursor key through libsecret and decrypts
+the access token in memory. The keyring must already be unlocked. For other
+encryption formats, run `agent login` and add a separate Cursor Agent account.
 Token Grill does not switch accounts after a sign-in failure. Open Cursor and
 sign in again, or run `agent login`, when a session expires.
 

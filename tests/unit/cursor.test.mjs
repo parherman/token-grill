@@ -68,6 +68,7 @@ test('Cursor current-period percentages use percentage points and millisecond-st
     assert.equal(window.percent, 0.10205850487540628);
     assert.equal(window.canonicalWindow, 'weekly');
     assert.equal(window.resetAt, 1792664856178);
+    assert.equal(window.durationSeconds, 604800);
     assert.equal(normalizeCursorUsage(usage({totalPercentUsed: 0.4}), UNTRANSLATED)[0].percent, 0.004);
     assert.equal(normalizeCursorUsage(usage({totalPercentUsed: 0}), UNTRANSLATED)[0].percent, 0);
     assert.equal(normalizeCursorUsage(usage({totalPercentUsed: 150}), UNTRANSLATED)[0].percent, 1);
@@ -83,6 +84,7 @@ test('Cursor included budgets use the allowance remaining rather than a differen
     assert.equal(window.percent, 0.58055);
     assert.equal(window.canonicalWindow, 'monthly');
     assert.equal(window.resetAt, 1771077734000);
+    assert.equal(window.durationSeconds, 2678400);
 });
 
 test('Cursor Enterprise summary uses the personal overall allowance', () => {
@@ -97,6 +99,7 @@ test('Cursor Enterprise summary uses the personal overall allowance', () => {
     assert.equal(window.percent, 0.25);
     assert.equal(window.resetAt, Date.parse('2026-12-01T00:00:00Z'));
     assert.equal(window.canonicalWindow, 'monthly');
+    assert.equal(window.durationSeconds, 2592000);
 });
 
 test('Cursor separates confirmed absence of quota from unrecognized data', () => {
@@ -112,6 +115,7 @@ test('Cursor unknown periods have a truthful label and invalid dates stay unavai
     assert.equal(window.canonicalWindow, 'other');
     assert.equal(window.label, 'Current period');
     assert.equal(window.resetAt, null);
+    assert.equal(window.durationSeconds, null);
     const [zero] = normalizeCursorUsage({planUsage: {totalPercentUsed: 0}, billingCycleStart: '0', billingCycleEnd: '0'}, UNTRANSLATED);
     assert.equal(zero.resetAt, null);
 });

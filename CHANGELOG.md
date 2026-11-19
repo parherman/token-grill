@@ -3,8 +3,11 @@
 ## 0.4.0 alpha 2
 
 - Token Grill also operates with GNOME Shell 48, 49, and 51.
+
 - Monitor the current allowance for Cursor IDE and Agent accounts that store
   readable local credentials.
+- Read encrypted Cursor IDE sign-ins that use the Linux Secret Service.
+- Show usage pace for Cursor quotas with a known billing period.
 
 ## 0.4.0 alpha 1
 

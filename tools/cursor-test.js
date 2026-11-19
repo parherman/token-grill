@@ -8,6 +8,7 @@ const [, metadata] = GLib.file_get_contents(`${root}/metadata.json`);
 const dist = `${root}/dist/${JSON.parse(new TextDecoder().decode(metadata)).uuid}`;
 const {CursorAuthStore, readCursorDatabase} = await import(`file://${dist}/providers/cursor/auth.js`);
 const {CursorCollector} = await import(`file://${dist}/providers/cursor/collector.js`);
+const {decodeCursorCiphertext, decryptCursorCiphertext} = await import(`file://${dist}/providers/cursor/safeStorage.js`);
 const {newProvider} = await import(`file://${dist}/core/config.js`);
 const {emptySnapshot} = await import(`file://${dist}/core/types.js`);
 const {CollectorError} = await import(`file://${dist}/core/errors.js`);
@@ -20,11 +21,13 @@ function assert(value, message) {
         throw new Error(message);
 }
 
-async function rejects(operation, code) {
+async function rejects(operation, code, message = null) {
     try {
         await operation();
     } catch (error) {
         assert(error instanceof CollectorError && error.code === code, `Expected ${code}`);
+        if (message !== null)
+            assert(error.message === message, `Expected ${message}`);
         return;
     }
     throw new Error(`Expected ${code}`);
@@ -33,6 +36,16 @@ async function rejects(operation, code) {
 function token(identity, expiry = 2000000000) {
     const claims = GLib.base64_encode(new TextEncoder().encode(JSON.stringify({sub: identity, exp: expiry})));
     return `fixture.${claims.replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '')}.signature`;
+}
+
+async function testEncryptedToken() {
+    // Produced independently with Node crypto using the Linux OSCrypt v11 format.
+    const encoded = 'djExz5pMmdisS93KpUv1+LrDcubZ8gMMn/bFtchaaBhTy/EYJd1zG3db6PgngHsd9LFnOqyY5UPq1w/GkqKdtdQyuhR/VNANKa1IB2wt3T6So0o=';
+    const ciphertext = decodeCursorCiphertext(encoded);
+    const decrypted = decryptCursorCiphertext(ciphertext, 'tokengrill-synthetic-key');
+    assert(decrypted === token('fixture-encrypted'), 'The existing Cursor token was not recovered');
+    await rejects(() => decryptCursorCiphertext(ciphertext, 'wrong-fixture-key'), 'auth-invalid');
+    console.log('Cursor Safe Storage encryption checks passed');
 }
 
 async function testDiscovery() {
@@ -105,6 +118,9 @@ async function testCursor() {
         assert((await store.load(account, null)).auth.identity === 'grok|user_rotated_profile', 'Profile-only WAL changes were ignored');
         writer.execute_non_select_command("UPDATE ItemTable SET value='{}' WHERE key='cursorAuth/cachedScopedProfile'");
         await rejects(() => store.load(account, null), 'auth-invalid');
+        const unsupported = GLib.base64_encode(new TextEncoder().encode('v20fixtureciphertex'));
+        writer.execute_non_select_command(`UPDATE ItemTable SET value='cursor-safe-storage:v1:${unsupported}' WHERE key='cursorAuth/accessToken'`);
+        await rejects(() => store.load(account, null), 'auth-invalid', 'The Cursor IDE sign-in uses an unsupported encryption format.');
         writeIdentity('fixture-personal');
         assert((await store.load(account, null)).auth.identity === 'fixture-personal', 'WAL changes did not invalidate credentials');
 
@@ -229,3 +245,4 @@ async function testCursor() {
 
 await testDiscovery();
 await testCursor();
+await testEncryptedToken();

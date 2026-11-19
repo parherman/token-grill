@@ -71,6 +71,7 @@ export interface UsageWindow {
     limit: number | null;
     percent: number | null;
     resetAt: number | null;
+    durationSeconds?: number | null;
     unit: 'credits' | null;
 }
 
