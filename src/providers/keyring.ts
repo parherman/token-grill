@@ -19,6 +19,8 @@ export interface KeyringTexts {
     unavailable: ErrorText;
 }
 
+type KeyringSession = 'shared' | 'fresh';
+
 // libsecret is optional, so a missing library becomes a message instead of a failed import.
 export async function importSecret(texts: KeyringTexts): Promise<typeof Secret> {
     let module: {default: typeof Secret};
@@ -31,16 +33,19 @@ export async function importSecret(texts: KeyringTexts): Promise<typeof Secret> 
     return module.default;
 }
 
-// The typings give Service.get no promise form.
-function secretService(library: typeof Secret, cancellable: Gio.Cancellable): Promise<Secret.Service> {
+function secretService(library: typeof Secret, cancellable: Gio.Cancellable, session: KeyringSession): Promise<Secret.Service> {
     return new Promise((resolve, reject) => {
-        library.Service.get(library.ServiceFlags.NONE, cancellable, (_source, result) => {
+        const finish: Gio.AsyncReadyCallback<Secret.Service> = (_source, result) => {
             try {
-                resolve(library.Service.get_finish(result));
+                resolve(session === 'fresh' ? library.Service.open_finish(result) : library.Service.get_finish(result));
             } catch (error) {
                 reject(error);
             }
-        });
+        };
+        if (session === 'fresh')
+            library.Service.open(library.Service.$gtype, null, library.ServiceFlags.NONE, cancellable, finish);
+        else
+            library.Service.get(library.ServiceFlags.NONE, cancellable, finish);
     });
 }
 
@@ -52,7 +57,8 @@ export async function lookupSecret(
     schemaName: string,
     attributes: Record<string, string>,
     cancellable: Gio.Cancellable,
-    texts: KeyringTexts
+    texts: KeyringTexts,
+    session: KeyringSession = 'shared'
 ): Promise<string | null> {
     const Secret = await importSecret(texts);
     const attributeTypes = Object.fromEntries(Object.keys(attributes).map(name => [name, Secret.SchemaAttributeType.STRING]));
@@ -78,8 +84,12 @@ export async function lookupSecret(
         lookup.cancel();
     });
     let items: Secret.Item[];
+    let service: Secret.Service | null = null;
+    let sessionOwner: string | null = null;
     try {
-        const service = await secretService(Secret, lookup);
+        service = await secretService(Secret, lookup, session);
+        if (session === 'fresh')
+            sessionOwner = service.get_name_owner();
         items = await service.search(schema, attributes, Secret.SearchFlags.LOAD_SECRETS, lookup);
     } catch (error) {
         if (!timedOut && (isCancellation(error) || !(error instanceof GLib.Error)))
@@ -88,6 +98,14 @@ export async function lookupSecret(
     } finally {
         removeTimeout();
         cancellable.disconnect(parentId);
+        if (service && sessionOwner && service.get_name_owner() === sessionOwner) {
+            const sessionPath = service.get_session_dbus_path();
+            // libsecret frees the local proxy, but closing its remote session requires an explicit call.
+            if (sessionPath) {
+                service.get_connection().call(sessionOwner, sessionPath, 'org.freedesktop.Secret.Session', 'Close', null, null,
+                    Gio.DBusCallFlags.NO_AUTO_START, -1, null, null);
+            }
+        }
     }
     const unlocked = items.find(item => !item.get_locked());
     if (!unlocked && items.length)

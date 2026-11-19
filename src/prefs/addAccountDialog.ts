@@ -22,6 +22,7 @@ const SIGN_IN_COMMANDS: Partial<Record<AccountApp, string>> = {
     'opencode': 'opencode auth login',
     'github-cli': 'gh auth login',
     'copilot-cli': 'copilot',
+    'cursor-agent': 'agent login',
 };
 
 function emptyHint(app: AccountApp): string {
@@ -77,6 +78,8 @@ export class AddAccountDialog extends Adw.Dialog {
         group.add(this._linkRow('Codex CLI', '', 'codex', open('codex-cli', 'Codex CLI')));
         group.add(this._linkRow('Claude Code', '', 'claude', open('claude-code', 'Claude Code')));
         group.add(this._linkRow('Kiro', '', 'kiro', open('kiro-cli', 'Kiro')));
+        group.add(this._linkRow('Cursor IDE', '', 'cursor', open('cursor-ide', 'Cursor IDE')));
+        group.add(this._linkRow('Cursor Agent', '', 'cursor', open('cursor-agent', 'Cursor Agent')));
         group.add(this._linkRow('Antigravity', '', 'antigravity', open('antigravity', 'Antigravity')));
         group.add(this._linkRow('OpenCode', _('Accounts connected in OpenCode'), 'opencode-go', open('opencode', 'OpenCode')));
         group.add(this._linkRow('GitHub Copilot', _('Through Copilot CLI or GitHub CLI'), 'copilot', () => this._view.push(this._copilotPage())));

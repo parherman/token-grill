@@ -3,7 +3,7 @@
 ## Service names
 
 Token Grill uses the names of the services that it monitors: Codex, Claude,
-Kiro, and Antigravity. It uses these names only to show the account of each
+Kiro, Antigravity, and Cursor. It uses these names only to show the account of each
 value. These names are trademarks of their owners. Token Grill is an
 independent project. The owners of these services do not endorse or sponsor
 Token Grill.

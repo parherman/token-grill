@@ -13,7 +13,7 @@ import {readCredentialJson} from '../providers/credentials.js';
 import {deepSeekKeyFromClaudeSettings} from '../providers/deepseek/normalize.js';
 import {readOpenCodeEntries} from '../providers/opencode/authFile.js';
 import type {OpenCodeEntry} from '../providers/opencode/entries.js';
-import {antigravityHomes, cliHomes, githubCliHomes, kimiHomes, kiroHomes} from './discovery.js';
+import {antigravityHomes, cliHomes, cursorHomes, githubCliHomes, kimiHomes, kiroHomes} from './discovery.js';
 
 // A sign-in that cannot be read is simply not offered.
 async function readOrNull<T>(read: () => Promise<T>): Promise<T | null> {
@@ -128,6 +128,8 @@ const FINDERS: Record<AccountApp, (search: Search) => Promise<Candidate[]>> = {
     'claude-settings': search => claudeSettingsCandidates(search.configured, search.cancellable),
     // A pasted key is typed in, not found.
     'keyring': () => Promise.resolve([]),
+    'cursor-ide': search => homeCandidates(cursorHomes('cursor-ide'), search.configured, search.identities, search.cancellable),
+    'cursor-agent': search => homeCandidates(cursorHomes('cursor-agent'), search.configured, search.identities, search.cancellable),
 };
 
 // Every account that can be added from one app, read-only and without network requests.

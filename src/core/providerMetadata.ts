@@ -93,6 +93,16 @@ export const PROVIDER_METADATA: Record<ProviderKind, ProviderMetadata> = {
         apps: ['kimi-cli', 'opencode'],
         measure: 'limits',
     },
+    cursor: {
+        label: 'Cursor',
+        defaultAccent: 'blue',
+        iconFile: 'cursor-symbolic.svg',
+        quotaWindows: ['weekly', 'monthly'],
+        defaultQuotaWindow: 'automatic',
+        localHistorySupported: false,
+        apps: ['cursor-ide', 'cursor-agent'],
+        measure: 'limits',
+    },
 };
 
 export function providerMetadata(kind: ProviderKind): ProviderMetadata {

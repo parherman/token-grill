@@ -93,7 +93,7 @@ test('refresh progress uses the native shell spinner and UI uses centralized pac
     assert.doesNotMatch(dashboard, /rotation-angle-z/);
     assert.match(widgets, /Gio\.FileIcon\.new\(file\)/);
     assert.match(widgets, /providerIconFile\(kind\)/);
-    for (const kind of ['codex', 'claude', 'kiro', 'antigravity'])
+    for (const kind of ['codex', 'claude', 'kiro', 'antigravity', 'cursor'])
         assert.match(metadata, new RegExp(`iconFile: '${kind}-symbolic\\.svg'`));
     assert.match(chip, /Gio\.icon_new_for_string\(`\$\{extensionPath\}\/icons\/providers\/\$\{providerIconFile\(kind\)\}`\)/);
 });
